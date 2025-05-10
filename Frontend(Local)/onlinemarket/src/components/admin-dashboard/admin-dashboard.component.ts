@@ -433,6 +433,19 @@ closeAddUserPopup(): void {
   // Optionally emit an event to notify the parent component that the popup was closed
 }
 
+
+removePhoto() {
+
+  const photoInput = document.getElementById('imageFile') as HTMLInputElement;
+
+  if (photoInput) {
+
+      photoInput.value = '';
+
+  }
+
+}
+
 resetForm(): void {
   this.addUser = {
     firstName: '',
