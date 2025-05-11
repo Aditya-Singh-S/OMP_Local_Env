@@ -22,6 +22,7 @@ import com.cts.entity.Products;
 import com.cts.entity.User;
 import com.cts.exception.InvalidCredentialsException;
 import com.cts.exception.InvalidInputException;
+import com.cts.exception.PasswordsMismatchException;
 import com.cts.exception.EmailNotVerifiedException;
 import com.cts.exception.UserNotFoundException;
 import com.cts.mapper.UserAdminMapper;
@@ -162,8 +163,7 @@ public class UserService {
     ) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-        String s3Key = uploadFileToS3(imageFile);
-		String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s%s", bucketName, s3KeyPrefix, s3Key);
+        
  
         if (password != null) {
             throw new InvalidInputException("You cannot change the password directly through the update profile. Please use the 'reset password' functionality.");
@@ -173,6 +173,8 @@ public class UserService {
         if (lastName != null) user.setLastName(lastName);
         if (email != null) user.setEmail(email);
         if (imageFile != null && !imageFile.isEmpty()) {
+        	String s3Key = uploadFileToS3(imageFile);
+    		String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s%s", bucketName, s3KeyPrefix, s3Key);
             user.setPhoto(imageUrl);
         } else if (imageFile != null && imageFile.isEmpty()) {
             user.setPhoto(null);
@@ -243,17 +245,16 @@ public class UserService {
     public String resetPassword(ResetPasswordDTO dto) {
         User user = userRepository.findByEmail(dto.getEmail());
         if (user == null) {
+            throw new UserNotFoundException("User not found!");
+        }
 
-        	throw new UserNotFoundException("User not found");
-        }
- 
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            return "Passwords do not match!";
+            throw new PasswordsMismatchException("Password does not match!");
         }
- 
+
         user.setPassword(PasswordUtil.hashPassword(dto.getNewPassword()));
         userRepository.save(user);
- 
+
         return "Password updated successfully!";
     }
  
