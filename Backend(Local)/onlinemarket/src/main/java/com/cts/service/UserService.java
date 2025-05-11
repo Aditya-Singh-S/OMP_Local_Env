@@ -22,6 +22,7 @@ import com.cts.entity.Products;
 import com.cts.entity.User;
 import com.cts.exception.InvalidCredentialsException;
 import com.cts.exception.InvalidInputException;
+import com.cts.exception.PasswordsMismatchException;
 import com.cts.exception.EmailNotVerifiedException;
 import com.cts.exception.UserNotFoundException;
 import com.cts.mapper.UserAdminMapper;
@@ -244,17 +245,16 @@ public class UserService {
     public String resetPassword(ResetPasswordDTO dto) {
         User user = userRepository.findByEmail(dto.getEmail());
         if (user == null) {
+            throw new UserNotFoundException("User not found!");
+        }
 
-        	throw new UserNotFoundException("User not found");
-        }
- 
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            return "Passwords do not match!";
+            throw new PasswordsMismatchException("Password does not match!");
         }
- 
+
         user.setPassword(PasswordUtil.hashPassword(dto.getNewPassword()));
         userRepository.save(user);
- 
+
         return "Password updated successfully!";
     }
  
