@@ -7,7 +7,7 @@
   <input id="firstName" formControlName="firstName" class="form-control" />
   <div *ngIf="signUpForm.get('firstName')?.errors && signUpForm.get('firstName')?.touched" class="text-danger">
   <div *ngIf="signUpForm.get('firstName')?.errors?.['required']">* First name is required.</div>
-  <div *ngIf="signUpForm.get('firstName')?.errors?.['pattern']">* Enter a valid first name (3-15 characters, letters, dots, or underscores).</div>
+  <div *ngIf="signUpForm.get('firstName')?.errors?.['pattern']">* Invalid First Name</div>
   </div>
    
         <!-- Last Name -->
@@ -15,14 +15,14 @@
   <input id="lastName" formControlName="lastName" class="form-control" />
   <div *ngIf="signUpForm.get('lastName')?.errors && signUpForm.get('lastName')?.touched" class="text-danger">
   <div *ngIf="signUpForm.get('lastName')?.errors?.['required']">* Last name is required.</div>
-  <div *ngIf="signUpForm.get('lastName')?.errors?.['pattern']">* Enter a valid last name (3-15 characters, letters, dots, or underscores).</div>
+  <div *ngIf="signUpForm.get('lastName')?.errors?.['pattern']">* Invalid Last Name</div>
   </div>
    
         <!-- Nickname -->
   <label for="nickName">Nickname:</label>
   <input id="nickName" formControlName="nickName" class="form-control" />
   <div *ngIf="signUpForm.get('nickName')?.errors && signUpForm.get('nickName')?.touched" class="text-danger">
-  <div *ngIf="signUpForm.get('nickName')?.errors?.['pattern']">* Enter a valid nickname (3-15 characters, letters, dots, or underscores).</div>
+  <div *ngIf="signUpForm.get('nickName')?.errors?.['pattern']">* Invalid Nick Name</div>
   </div>
    
         <!-- Date of Birth -->
@@ -112,8 +112,19 @@
             * Passwords do not match.
   </div>        
   </div>
-   
-        <button type="submit" [disabled]="signUpForm.invalid || photoError" class="btn btn-primary">Submit</button>
+
+      <button type="submit" [disabled]="signUpForm.invalid || photoError" class="btn btn-primary">Submit</button>
+      <div *ngIf="showPopup" class="popup">
+      <div class="popup-content" [ngClass]="{'success': popupType === 'success', 'error': popupType === 'error'}">
+            <div class="popup-header">
+            <h2>{{ popupTitle }}</h2>
+            <span class="close-button" (click)="closePopup()">&times;</span>
+            </div>
+            <div class="popup-body">
+            <p>{{ popupMessage }}</p>
+            </div>
+      </div>
+      </div>
   </div>
   </div>
   </form>

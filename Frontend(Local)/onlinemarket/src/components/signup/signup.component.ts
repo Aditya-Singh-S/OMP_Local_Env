@@ -37,6 +37,10 @@ export class SignupComponent {
   potentiallyDuplicateEmails: string[] = [];
 
   destroy$ = new Subject<void>();
+  showPopup: boolean = false;
+  popupTitle: string = '';
+  popupMessage: string = '';
+  popupType: 'success' | 'error' = 'success';
  
   constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
 
@@ -52,19 +56,7 @@ export class SignupComponent {
 
       contactNo: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
 
-      password: [
-
-        '',
-
-        [
-
-          Validators.required,
-
-          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/)
-
-        ]
-
-      ],
+      password: ['',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/)]],
 
       confirmPassword: ['', [Validators.required]],
 
@@ -87,8 +79,6 @@ export class SignupComponent {
         this.signUpForm.get('email')?.setErrors({ 'potentialDuplicate': true });
 
       } else if (this.signUpForm.get('email')?.errors?.['potentialDuplicate']) {
-
-        // Clear the potentialDuplicate error if the email changes to something new
 
         const currentErrors = { ...this.signUpForm.get('email')?.errors };
 
@@ -180,8 +170,6 @@ onSubmit(): void {
   if (this.signUpForm.valid && !this.photoError) {
 
     const formData = new FormData();
- 
-    // Append each field individually
 
     formData.append('firstName', this.signUpForm.get('firstName')?.value || '');
 
@@ -199,11 +187,9 @@ onSubmit(): void {
 
     formData.append('postalCode', this.signUpForm.get('postalCode')?.value || '');
 
-    formData.append('contactNumber', this.signUpForm.get('contactNo')?.value || ''); // Ensure "contactNumber" matches the backend
+    formData.append('contactNumber', this.signUpForm.get('contactNo')?.value || ''); 
 
     formData.append('dateOfBirth', this.signUpForm.get('dob')?.value || '');
- 
-    // Append the file
 
     const photoInput = (document.getElementById('photo') as HTMLInputElement);
 
@@ -211,6 +197,8 @@ onSubmit(): void {
 
       formData.append('imageFile', photoInput.files[0]);
 
+    }else{
+      this.photoError = 'Photo is required.';
     }
  
     console.log(Array.from(formData.entries())); // Debugging log
@@ -218,16 +206,17 @@ onSubmit(): void {
     this.userService.register(formData).subscribe({
 
       next: (response) => {
-
-        console.log('Registration successful:', response)
-
-        this.router.navigate(['/signin']).then(() => {
-
-          window.location.reload();
-
-        });
-
-        alert('Registration successful! Please check your email for verification.');
+        console.log('Registration successful:', response);
+        this.popupTitle = 'Success';
+        this.popupMessage = 'Registration successful! Please check your email for verification.';
+        this.popupType = 'success';
+        this.showPopup = true; // Show the popup
+        setTimeout(() => {
+          this.showPopup = false; // Hide after a delay (optional)
+          this.router.navigate(['/signin']).then(() => {
+            window.location.reload();
+          });
+        }, 3000);
 
       },
 
@@ -259,6 +248,9 @@ onSubmit(): void {
 
   }
 
+}
+closePopup() {
+  this.showPopup = false;
 }
  
 }

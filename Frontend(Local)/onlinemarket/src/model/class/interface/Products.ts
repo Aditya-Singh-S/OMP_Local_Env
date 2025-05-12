@@ -5,6 +5,7 @@ export interface IProductDTO{
   description? : string, // Make description optional
   avg_rating : number,
   subscription_count : number
+  isactive : boolean
 }
 
 export interface IReview {
