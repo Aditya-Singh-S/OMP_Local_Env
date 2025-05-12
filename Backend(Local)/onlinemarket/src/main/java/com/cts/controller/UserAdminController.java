@@ -165,7 +165,7 @@ public class UserAdminController {
             .body(excelFile);
     }
     
-    //geting al user
+    //getting all user
     @GetMapping("/admin/users")
     public ResponseEntity<List<UserDetailDTO>> getAllUsersForAdmin() {
         List<User> users = userAdminService.getAllUsers();
@@ -190,7 +190,7 @@ public class UserAdminController {
     }
  
     
-    //geting  al user with filter
+    //getting all user with filter
     @GetMapping("/admin/users/filter")
     public ResponseEntity<List<UserDetailDTO>> getUsersByActiveStatus(@RequestParam("isActive") boolean isActive) {
         List<User> users = userAdminService.getUsersByIsActive(isActive);
