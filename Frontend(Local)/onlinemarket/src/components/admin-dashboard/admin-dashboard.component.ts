@@ -186,7 +186,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
  
   submitBulkProducts() {
     if (this.bulkFile) {
-      this.productService.uploadMultipleProducts(this.bulkFile)
+      this.productService.uploadMultipleProducts(this.bulkFile,this.bulkProductisactive)
         .subscribe(response => {
           alert('Multiple products added successfully');
           this.closeAddMultipleProductsPopup();
@@ -195,6 +195,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         });
     }
   }
+  
  
   openUpdateProductPopup() {
     this.showUpdatePopup = true;

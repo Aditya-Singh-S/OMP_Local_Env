@@ -96,6 +96,10 @@ public interface ProductService {
 
 	Products updateProduct(String name, String upName, String description, MultipartFile imageFile, Boolean isActive)
 			throws InvalidInputException, IOException;
+
+	//List<Products> addMultipleProducts(MultipartFile file) throws IOException;
+
+	List<Products> addMultipleProducts(MultipartFile file, boolean bulkProductisactive) throws IOException;
 }
 
 
