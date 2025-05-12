@@ -1,181 +1,109 @@
-
-
+ 
 package com.cts.service;
-
+ 
 import java.time.LocalDate;
-
 import java.time.format.DateTimeFormatter;
-
 import java.time.format.DateTimeParseException;
-
 import java.util.Date;
-
 import java.util.regex.Pattern;
-
+ 
 import com.cts.entity.User;
-
 import com.cts.exception.AgeValidationException;
-
 import com.cts.exception.DuplicateEmailException;
-
 import com.cts.exception.InvalidEmailFormatException;
-
 import com.cts.exception.InvalidInputException;
-
 import com.cts.exception.PhotoSizeValidationException;
-
 import com.cts.repository.UserRepository;
-
+ 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
-
+ 
 @Service
-
 public class UserValidationService {
-
+ 
     @Autowired
-
     private UserRepository userRepository;
-
+ 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+ 
     public void validate(User user) {
-
         validateMandatoryFields(user);
-
         validateAge(user.getDateOfBirth());
-
 //        validatePhotoSize(user.getPhoto());
-
     }
-
+ 
     public void validateOnUpdate(User user) {
-
         validateMandatoryFieldsOnUpdate(user);
-
         validateAgeOnUpdate(user.getDateOfBirth());
-
 //        validatePhotoSizeOnUpdate(user.getPhoto());
-
         checkPostalCodeAndDateOfBirthOnUpdate(user.getPostalCode(), user.getDateOfBirth());
-
     }
-
+    
     public void validateAdminAddUser(User user) {
-
     	validateMandatoryFieldsAdminAddUser(user);
-
         validateAge(user.getDateOfBirth());
-
 //        validatePhotoSize(user.getPhoto());
-
     }
-
+ 
     private void validateMandatoryFields(User user) {
-
         isValidFirstName(user.getFirstName());
-
         isValidLastName(user.getLastName());
-
         isValidNickName(user.getNickName());
-
         isValidEmail(user.getEmail());
-
         isValidContactNumber(user.getContactNumber());
-
         isValidPassword(user.getPassword());
-
         isValidAddressLine1(user.getAddressLine1());
-
         isValidAddressLine2(user.getAddressLine2());
-
         isValidPostalCode(user.getPostalCode());
-
         isValidDateOfBirth(user.getDateOfBirth());
-
     }
-
-
+ 
+ 
     private void validateMandatoryFieldsOnUpdate(User user) {
-
         isValidFirstNameOnUpdate(user.getFirstName());
-
         isValidLastNameOnUpdate(user.getLastName());
-
         isValidNickNameOnUpdate(user.getNickName());
-
         isValidEmailOnUpdate(user.getEmail());
-
         isValidContactNumberOnUpdate(user.getContactNumber());
-
         isValidAddressLine1OnUpdate(user.getAddressLine1());
-
         isValidAddressLine2OnUpdate(user.getAddressLine2());
-
         isValidPostalCodeOnUpdate(user.getPostalCode());
-
         isValidDateOfBirthOnUpdate(user.getDateOfBirth());
-
+ 
     }
-
+    
     private void validateMandatoryFieldsAdminAddUser(User user) {
-
     	isValidFirstName(user.getFirstName());
-
         isValidLastName(user.getLastName());
-
         isValidNickName(user.getNickName());
-
         isValidEmail(user.getEmail());
-
         isValidContactNumber(user.getContactNumber());
-
         isValidAddressLine1(user.getAddressLine1());
-
         isValidAddressLine2(user.getAddressLine2());
-
         isValidPostalCode(user.getPostalCode());
-
         isValidDateOfBirth(user.getDateOfBirth());
-
     }
-
-
+ 
+ 
     //checking the validation of the first name
-
     private void isValidFirstName(String firstName) {
-
         if (firstName == null || firstName.isBlank()) {
-
             throw new InvalidInputException("First Name cannot be blank.");
-
         }
-
         if (firstName.length() < 3 || firstName.length() > 15) {
-
             throw new InvalidInputException("Invalid Format of First Name: Length must be between 3 and 15 characters.");
-
         }
-<<<<<<< HEAD
-
-        if (!firstName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
-
-=======
-        if (!firstName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
+        if (!firstName.matches("[a-zA-Z._0-9]+")) {
             throw new InvalidInputException("Invalid Format of First Name: Only alphabetic characters, dots, and underscores are allowed.");
-
         }
-
     }
-
+ 
     private void isValidFirstNameOnUpdate(String firstName) {
         if (firstName != null) {
             if (firstName.isBlank()) {
                 throw new InvalidInputException("First Name cannot be blank.");
             }
-            if (firstName.length() < 3 || firstName.length() > 15 || !firstName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
+            if (firstName.length() < 3 || firstName.length() > 15 || !firstName.matches("[a-zA-Z._0-9]+")) {
                 throw new InvalidInputException("Invalid Format of First Name: Length must be between 3 and 15 characters, and only alphabetic characters, dots, and underscores are allowed.");
             }
         }
@@ -190,7 +118,7 @@ public class UserValidationService {
         if (lastName.length() < 3 || lastName.length() > 15) {
             throw new InvalidInputException("Invalid Format of Last Name: Length must be between 3 and 15 characters.");
         }
-        if (!lastName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
+        if (!lastName.matches("[a-zA-Z._0-9]+")) {
             throw new InvalidInputException("Invalid Format of Last Name: Only alphabetic characters, dots, and underscores are allowed.");
         }
     }
@@ -200,7 +128,7 @@ public class UserValidationService {
             if (lastName.isBlank()) {
                 throw new InvalidInputException("Last Name cannot be blank.");
             }
-            if (lastName.length() < 3 || lastName.length() > 15 || !lastName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
+            if (lastName.length() < 3 || lastName.length() > 15 || !lastName.matches("[a-zA-Z._0-9]+")) {
                 throw new InvalidInputException("Invalid Format of Last Name: Length must be between 3 and 15 characters, and only alphabetic characters, dots, and underscores are allowed.");
             }
         }
@@ -212,7 +140,7 @@ public class UserValidationService {
         if (nickName == null || nickName.isBlank()) {
             throw new InvalidInputException("Nick Name cannot be blank.");
         }
-        if (nickName.length() < 3 || !nickName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
+        if (nickName.length() < 3 || !nickName.matches("[a-zA-Z]+")) {
             throw new InvalidInputException("Invalid Format of Nick Name: Length must be at least 3 characters and contain only alphabetic characters.");
         }
     }
@@ -222,7 +150,7 @@ public class UserValidationService {
             if (nickName.isBlank()) {
                 throw new InvalidInputException("Nick Name cannot be blank.");
             }
-            if (nickName.length() < 3 || !nickName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
+            if (nickName.length() < 3 || !nickName.matches("[a-zA-Z]+")) {
                 throw new InvalidInputException("Invalid Format of Nick Name: Length must be at least 3 characters and contain only alphabetic characters.");
             }
         }
@@ -281,7 +209,7 @@ public class UserValidationService {
             if (contactNumber.isBlank()) {
                 throw new InvalidInputException("Contact Number cannot be blank.");
             }
-            if (contactNumber.length() != 10 || !contactNumber.matches("[6-9][0-9]{9}")) {
+            if (contactNumber.length() != 10 || !contactNumber.matches("[1-9][0-9]{9}")) {
                 throw new InvalidInputException("Wrong format of contact number: Must be 10 digits and start with 1-9.");
             }
         }
@@ -293,13 +221,13 @@ public class UserValidationService {
         if (password == null || password.isBlank()) {
             throw new InvalidInputException("Password cannot be blank.");
         }
-        String valid_password = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$";
+        String valid_password = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>]{6,}$";
         if (password.contains(" ") || password.contains("/")) {
             throw new InvalidInputException("Password must not contain spaces or slashes (/).");
         }
  
         if (!password.matches(valid_password)) {
-            throw new InvalidInputException("Password must contain at least one numeric digit, one lowercase letter, one uppercase letter, and be at least 6 characters long.");
+            throw new InvalidInputException("Password must contain at least one numeric digit, one lowercase letter, one uppercase letter, one special character, and be at least 6 characters long.");
         }
     }
  
@@ -478,4 +406,3 @@ public class UserValidationService {
         }
     }
 }
- 

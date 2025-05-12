@@ -8,16 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-<<<<<<< HEAD
-=======
-import java.util.Arrays;
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -82,37 +75,16 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
     
-    
    
     public List<ProductViewDTO> viewAllProducts() {
-<<<<<<< HEAD
-        List<Products> allProducts = productRepository.findAll();
- 
-=======
-        List<Products> allProducts = productRepository.findAll(); 
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
-        if (allProducts == null || allProducts.isEmpty()) {
-            throw new InvalidProductException("No products available to display.");
-        } else {
-            return allProducts.stream()
-<<<<<<< HEAD
-                    .filter(Products::getIsActive)
-=======
-                    .filter(Products::getIsActive) 
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
-                    .map(product -> {
-                        ProductViewDTO dto = new ProductViewDTO();
-                        dto.setProductid(product.getProductid());
-                        dto.setName(product.getName());
-                        dto.setDescription(product.getDescription());
-                        dto.setImageUrl(product.getImageUrl());
-                        return dto;
-                    })
-                    .collect(Collectors.toList());
-        }
-    }
-<<<<<<< HEAD
+    	
+List<ProductViewDTO> allProducts = productViewRepo.findAll();
+    	
+    	if (allProducts == null || allProducts.isEmpty()) {
+          throw new InvalidProductException("No products available to display.");
+    	} else {
+    		return allProducts;
+    	}
     	
 //        List<Products> allProducts = productRepository.findAll(); // Fetch all Products entities
 //
@@ -131,12 +103,8 @@ public class ProductServiceImpl implements ProductService {
 //                    })
 //                    .collect(Collectors.toList());
 //      }
-//    }
-=======
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
+    }
 
-    	
-   
     @Override
     public ProductViewDTO viewProductById(int id) {
         ProductViewDTO productOptional = productViewRepo.findById(id).get();
@@ -145,113 +113,51 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Products addProduct(String name, String description, MultipartFile imageFile, Boolean isActive) throws IOException {
-    	
-        final int MAX_NAME_LENGTH = 255;
-        //final List<String> SUPPORTED_FILE_TYPES = Arrays.asList("jpg", "jpeg", "png", "gif");
- 
-        // Validation checks
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Validation Error: 'name' field is required.");
-        }
-        if (name.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException("Validation Error: 'name' field exceeds maximum allowed length of " + MAX_NAME_LENGTH + " characters.");
-        }
-        if (isActive == null) {
-            throw new IllegalArgumentException("Validation Error: 'isActive' field is required.");
-        }
-        
-        
-<<<<<<< HEAD
-        String sanitizedProductName = name.replaceAll("\\s+", "_");
-        String fileExtension = getFileExtension(imageFile.getContentType());
-        String s3Key = s3KeyPrefix + sanitizedProductName + "." + fileExtension;
-=======
-        String sanitizedProductName = name.replaceAll("\\s+", "_"); 
-        String fileExtension = getFileExtension(imageFile.getContentType()); 
-        String s3Key = s3KeyPrefix + sanitizedProductName + "." + fileExtension; 
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
-        uploadFileToS3(imageFile, s3Key);
-        String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s", bucketName, s3Key);
+        String s3Key = uploadFileToS3(imageFile);
+        String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s%s", bucketName, s3KeyPrefix, s3Key);
         Products product = new Products();
         product.setName(name);
         product.setDescription(description);
         product.setImageUrl(imageUrl);
         product.setIsActive(isActive);
-        
         return productRepository.save(product);
     }
-<<<<<<< HEAD
- 
- 
-    @Override
-    public Products updateProduct(String name, String upName, String description, MultipartFile imageFile, Boolean isActive)
-            throws InvalidInputException, IOException {
- 
-=======
-
 
     @Override
     public Products updateProduct(String name, String upName, String description, MultipartFile imageFile, Boolean isActive)
             throws InvalidInputException, IOException {
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
         Products product = productRepository.findByName(name)
                 .orElseThrow(() -> new InvalidInputException("Product not found with Name: " + name));
-        if (upName != null) {
+        if (upName != null)
             product.setName(upName);
-        }
-        if (description != null) {
+        if (description != null)
             product.setDescription(description);
-        }
-        if (imageFile != null) {
-            String sanitizedProductName = (upName != null) ? upName : product.getName();
-            sanitizedProductName = sanitizedProductName.replaceAll("\\s+", "_");
-            String fileExtension = getFileExtension(imageFile.getContentType());
-            String s3Key = s3KeyPrefix + sanitizedProductName + "." + fileExtension;
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
-            uploadFileToS3(imageFile, s3Key);
-            String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s", bucketName, s3Key);
+        if (imageFile != null && imageFile != null) {
+            String s3Key = uploadFileToS3(imageFile);
+            String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s%s", bucketName, s3KeyPrefix, s3Key);
             product.setImageUrl(imageUrl);
         }
-        if (isActive != null) {
+        if (isActive != null)
             product.setIsActive(isActive);
-        }
         return productRepository.save(product);
     }
-<<<<<<< HEAD
- 
- 
-=======
 
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
-    private void uploadFileToS3(MultipartFile file, String s3Key) throws IOException {
+    private String uploadFileToS3(MultipartFile file) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        String key = s3KeyPrefix + originalFilename; // Use originalFilename as the key.
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(s3Key)
+                .key(key)
                 .contentType(file.getContentType())
                 .build();
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
         try {
             s3Client.putObject(putRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            return originalFilename; // Return the original filename.
         } catch (S3Exception e) {
             throw new IOException("Could not upload image to S3: " + e.getMessage());
         }
     }
-<<<<<<< HEAD
- 
-=======
 
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
     @Override
     public byte[] getProductImage(int id) {
         Products product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
@@ -364,171 +270,80 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-<<<<<<< HEAD
+//    @Override
+//    public List<ProductViewDTO> readProductsFromXlsx(MultipartFile file) throws IOException {
+//        List<ProductViewDTO> productDTOs = new ArrayList<>();
+//        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+//            Sheet sheet = workbook.getSheetAt(0);
+//            for (Row row : sheet) {
+//                if (row.getRowNum() == 0)
+//                    continue;
+//                ProductViewDTO productDTO = new ProductViewDTO();
+//                productDTO.setName(row.getCell(0).getStringCellValue());
+//                productDTO.setDescription(row.getCell(1).getStringCellValue());
+//                // Assuming the local image path is in the third column (index 2)
+//                String localImagePath = row.getCell(2).getStringCellValue();
+//                productDTO.setLocalImagePath(localImagePath);
+//                productDTOs.add(productDTO);
+//            }
+//        }
+//        return productDTOs;
+//    }
 
-    @Override
-    public List<Products> addMultipleProducts(MultipartFile file,boolean bulkProductisactive) throws IOException {
-        List<Products> savedProducts = new ArrayList<>();
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-            Sheet sheet = workbook.getSheetAt(0);
-            List<? extends PictureData> pictures = workbook.getAllPictures();
-            Iterator<Row> rowIterator = sheet.iterator();
-            int pictureIndex = 0;
-            if (rowIterator.hasNext()) {
-                rowIterator.next();
-            }
+//    @Override
+//    public List<ProductUploadDTO> readProductsFromXlsx(MultipartFile file) throws IOException {
+//        List<ProductUploadDTO> uploadDTOs = new ArrayList<>();
+//        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+//            Sheet sheet = workbook.getSheetAt(0);
+//            for (Row row : sheet) {
+//                if (row.getRowNum() == 0)
+//                    continue;
+//                ProductUploadDTO uploadDTO = new ProductUploadDTO();
+//                uploadDTO.setName(row.getCell(0).getStringCellValue());
+//                uploadDTO.setDescription(row.getCell(1).getStringCellValue());
+//                try {
+//                    uploadDTO.setLocalImagePath(row.getCell(2).getStringCellValue());
+//                } catch (Exception e) {
+//                    System.err.println("Error reading local image path from Excel: " + e.getMessage());
+//                    uploadDTO.setLocalImagePath(null);
+//                }
+//                uploadDTOs.add(uploadDTO);
+//            }
+//        }
+//        return uploadDTOs; // Directly return List<ProductUploadDTO>
+//    }
 
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                String name = null;
-                String description = null;
-
-                try {
-                    name = row.getCell(0).getStringCellValue();
-                } catch (Exception e) {
-                    System.err.println("Error reading product name at row " + row.getRowNum() + ": " + e.getMessage());
-                    continue;
-                }
-                try {
-                    description = row.getCell(1).getStringCellValue();
-                } catch (Exception e) {
-                    System.err.println("Error reading product description at row " + row.getRowNum() + ": " + e.getMessage());
-                    description = "";
-                }
-
-                String imageUrl = null;
-                if (pictureIndex < pictures.size()) {
-                    PictureData pictureData = pictures.get(pictureIndex);
-                    String mimeType = pictureData.getMimeType();
-                    byte[] imageData = pictureData.getData();
-                    String fileExtension = getFileExtension(mimeType);
-                    String s3Key = s3KeyPrefix + name.replaceAll("\\s+", "_") + "." + fileExtension;
-
-                    try {
-                        uploadImageToS3(imageData, s3Key, mimeType);
-                        imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s", bucketName, s3Key);
-                        pictureIndex++;
-                    } catch (Exception e) {
-                        System.err.println("Error uploading image for product " + name + ": " + e.getMessage());
-                    }
-                } else {
-                    System.out.println("No image found for product: " + name + " (row " + row.getRowNum() + ")");
-                }
-
-                Products product = new Products();
-                product.setName(name);
-                product.setDescription(description);
-                product.setImageUrl(imageUrl);
-                product.setIsActive(bulkProductisactive); 
-                savedProducts.add(productRepository.save(product));
-            }
-        }
-        return savedProducts;
-    }
-
-    private void uploadImageToS3(byte[] imageData, String key, String contentType) throws IOException {
-        PutObjectRequest putRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(contentType)
-                .build();
-        try {
-            s3Client.putObject(putRequest, RequestBody.fromBytes(imageData));
-        } catch (S3Exception e) {
-            throw new IOException("Could not upload image to S3: " + e.getMessage());
-        }
-    }
-
-    private String getFileExtension(String mimeType) {
-        return switch (mimeType) {
-            case "image/jpeg", "image/jpg" -> "jpg";
-            case "image/png" -> "png";
-            default -> throw new IllegalArgumentException("Unexpected value: " + mimeType);
-        };
-    }
- 
-=======
-    
-    @Override
-    public List<Products> addMultipleProducts(MultipartFile file,boolean bulkProductisactive) throws IOException {
-        List<Products> savedProducts = new ArrayList<>();
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-            Sheet sheet = workbook.getSheetAt(0);
-            List<? extends PictureData> pictures = workbook.getAllPictures();
-            Iterator<Row> rowIterator = sheet.iterator();
-            int pictureIndex = 0;
-            if (rowIterator.hasNext()) {
-                rowIterator.next();
-            }
-
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                String name = null;
-                String description = null;
-
-                try {
-                    name = row.getCell(0).getStringCellValue();
-                } catch (Exception e) {
-                    System.err.println("Error reading product name at row " + row.getRowNum() + ": " + e.getMessage());
-                    continue;
-                }
-                try {
-                    description = row.getCell(1).getStringCellValue();
-                } catch (Exception e) {
-                    System.err.println("Error reading product description at row " + row.getRowNum() + ": " + e.getMessage());
-                    description = "";
-                }
-
-                String imageUrl = null;
-                if (pictureIndex < pictures.size()) {
-                    PictureData pictureData = pictures.get(pictureIndex);
-                    String mimeType = pictureData.getMimeType();
-                    byte[] imageData = pictureData.getData();
-                    String fileExtension = getFileExtension(mimeType);
-                    String s3Key = s3KeyPrefix + name.replaceAll("\\s+", "_") + "." + fileExtension;
-
-                    try {
-                        uploadImageToS3(imageData, s3Key, mimeType);
-                        imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s", bucketName, s3Key);
-                        pictureIndex++;
-                    } catch (Exception e) {
-                        System.err.println("Error uploading image for product " + name + ": " + e.getMessage());
-                    }
-                } else {
-                    System.out.println("No image found for product: " + name + " (row " + row.getRowNum() + ")");
-                }
-
-                Products product = new Products();
-                product.setName(name);
-                product.setDescription(description);
-                product.setImageUrl(imageUrl);
-                product.setIsActive(bulkProductisactive); 
-                savedProducts.add(productRepository.save(product));
-            }
-        }
-        return savedProducts;
-    }
-
-    private void uploadImageToS3(byte[] imageData, String key, String contentType) throws IOException {
-        PutObjectRequest putRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(contentType)
-                .build();
-        try {
-            s3Client.putObject(putRequest, RequestBody.fromBytes(imageData));
-        } catch (S3Exception e) {
-            throw new IOException("Could not upload image to S3: " + e.getMessage());
-        }
-    }
-
-    private String getFileExtension(String mimeType) {
-        return switch (mimeType) {
-            case "image/jpeg", "image/jpg" -> "jpg";
-            case "image/png" -> "png";
-            default -> throw new IllegalArgumentException("Unexpected value: " + mimeType);
-        };
-    }
-
->>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
+//    @Override
+//    public List<Products> saveProducts(List<ProductUploadDTO> uploadDTOs) { // Expect List<ProductUploadDTO>
+//        List<Products> allProduct = new ArrayList<>();
+//        for (ProductUploadDTO uploadDTO : uploadDTOs) {
+//            Products product = new Products();
+//            product.setName(uploadDTO.getName());
+//            product.setDescription(uploadDTO.getDescription());
+//
+//            String localImagePath = uploadDTO.getLocalImagePath();
+//            String s3ImageUrl = null;
+//
+//            if (localImagePath != null && !localImagePath.trim().isEmpty()) {
+//                Path localFile = Paths.get(localImagePath);
+//                if (Files.exists(localFile)) {
+//                    try {
+//                        String fileName = localFile.getFileName().toString();
+//                        String s3Key = uploadFileToS3(localFile, fileName);
+//                        s3ImageUrl = String.format("https://%s.s3.amazonaws.com/%s%s", bucketName, s3KeyPrefix, fileName);
+//                    } catch (IOException e) {
+//                        System.err.println("Error uploading image from " + localImagePath + " to S3: " + e.getMessage());
+//                        // Handle the error appropriately
+//                    }
+//                } else {
+//                    System.err.println("Local image file not found at: " + localImagePath);
+//                    // Handle the case where the local file doesn't exist
+//                }
+//            }
+//            product.setImageUrl(s3ImageUrl); // Set the S3 URL (or null if upload failed)
+//            allProduct.add(product);
+//        }
+//        productRepository.saveAll(allProduct);
+//        return allProduct;
+//    }
 }
