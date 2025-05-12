@@ -157,9 +157,13 @@ public class UserValidationService {
             throw new InvalidInputException("Invalid Format of First Name: Length must be between 3 and 15 characters.");
 
         }
+<<<<<<< HEAD
 
         if (!firstName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
 
+=======
+        if (!firstName.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$")) {
+>>>>>>> b85fed8b0f2e41702de018f0a585262cf30fb470
             throw new InvalidInputException("Invalid Format of First Name: Only alphabetic characters, dots, and underscores are allowed.");
 
         }
