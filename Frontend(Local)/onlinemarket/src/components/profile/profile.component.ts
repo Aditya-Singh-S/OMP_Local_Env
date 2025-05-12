@@ -184,12 +184,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
       });
     }
   }
-
+ 
   openSubscriptions(): void {
     console.log('openSubscriptions() called'); // Diagnostic log
     this.productSubscriptionsPopup.openSubscriptionPopup();
   }
-
+ 
     openReviewPopup(): void {
       this.productReviewsPopup.openReviewPopup();
     }
