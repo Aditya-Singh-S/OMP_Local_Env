@@ -38,8 +38,8 @@ export class VerifyEmailComponent implements OnInit {
 
   verifyEmail(email:string, code: string) : void {
     const poolData = {
-      UserPoolId: 'us-east-1_v6dUUkwbr',
-      ClientId: '5b5k6sbfttg4koe5skac2hipbo'
+      UserPoolId: 'us-east-1_xfDGaQqxz',
+      ClientId: '3htlbjbquppu1gj0j1clc39e54'
     };
 
     const userPool = new CognitoUserPool(poolData);
@@ -71,5 +71,5 @@ export class VerifyEmailComponent implements OnInit {
   goToSignIn(): void {
     this.router.navigate(['/signin'])
   }
-  
+
 }
