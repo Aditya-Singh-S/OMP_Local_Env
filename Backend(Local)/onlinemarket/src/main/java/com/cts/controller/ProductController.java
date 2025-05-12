@@ -146,12 +146,22 @@ public class ProductController {
         List<User> subscribedUsers = productService.getUsersSubscribedToProduct(productId);
         return new ResponseEntity<>(subscribedUsers, subscribedUsers.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
-//    @PostMapping("/admin/uploadMultipleRecords")
-//  public ResponseEntity<?> uploadProducts(@RequestParam("file") MultipartFile file) {
-//      if (file.isEmpty()) {
-//          return new ResponseEntity<>("Please upload an Excel file!", HttpStatus.BAD_REQUEST);
-//      }
-//
+    
+    @PostMapping("/admin/uploadMultipleRecords")
+    public ResponseEntity<List<Products>> uploadMultipleProducts(@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
+        if (file.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+ 
+        try {
+            List<Products> uploadedProducts = productService.addMultipleProducts(file,bulkProductisactive);
+            return new ResponseEntity<>(uploadedProducts, HttpStatus.CREATED);
+        } catch (IOException e) {
+            System.err.println("Error processing Excel file: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+ 
 //      String contentType = file.getContentType();
 //      if (contentType == null || (!contentType.equals("application/vnd.ms-excel") && !contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))) {
 //          return new ResponseEntity<>("Please upload a valid Excel file (.xls or .xlsx)!", HttpStatus.BAD_REQUEST);
