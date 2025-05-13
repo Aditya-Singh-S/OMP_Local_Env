@@ -14,6 +14,8 @@ import com.cts.exception.InvalidProductException;
 import com.cts.exception.InvalidSubscriptionException;
 import com.cts.entity.ProductSubscription;
 import com.cts.service.ProductService;
+import com.cts.service.SNSService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +41,9 @@ import org.springframework.core.io.Resource;
 @Validated
 public class ProductController {
 
+	@Autowired
+	SNSService snsService;
+	
     private final ProductService productService;
 
     @Autowired
@@ -54,6 +59,7 @@ public class ProductController {
             @RequestParam("imageFile") MultipartFile file,
             @RequestParam(required = false, value = "isActive") Boolean isActive) throws IOException {
         Products newProduct = productService.addProduct(name, description, file, isActive);
+        snsService.notifyOnAddProduct();
         return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
     }
 

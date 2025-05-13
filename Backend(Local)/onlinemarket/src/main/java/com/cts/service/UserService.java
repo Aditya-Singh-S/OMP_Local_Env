@@ -43,7 +43,8 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
  
 @Service
 public class UserService {
- 
+	@Autowired
+	SNSService snsService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -212,6 +213,7 @@ public class UserService {
         userValidationService.validate(user);
         user.setPassword(util.hashPassword(user.getPassword()));
         User savedUser = userRepository.save(user);
+        snsService.subscribeUser(user.getEmail());
         return userMapper.toDTO(savedUser);
     }
  

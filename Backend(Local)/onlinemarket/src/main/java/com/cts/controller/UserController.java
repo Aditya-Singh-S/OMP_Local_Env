@@ -36,6 +36,7 @@ import com.cts.dto.SignInResponse;
 import com.cts.entity.User;
 import com.cts.exception.UserNotFoundException;
 import com.cts.service.ProductService;
+import com.cts.service.SNSService;
 import com.cts.service.UserService;
 
 
@@ -49,6 +50,9 @@ import com.cts.service.UserValidationService;
 @CrossOrigin(origins = "http://127.0.0.1:3000")
 @Validated
 public class UserController {
+	@Autowired
+	SNSService snsService;
+	
     @Autowired
     private UserService userService;
     @Autowired
@@ -98,6 +102,7 @@ public class UserController {
         requestDTO.setDateOfBirth(dateOfBirth); // Pass String
  
         ResponseDTO responseDTO = userService.createUser(requestDTO, imageFile);
+        
         return ResponseEntity.ok(responseDTO);
     }
  

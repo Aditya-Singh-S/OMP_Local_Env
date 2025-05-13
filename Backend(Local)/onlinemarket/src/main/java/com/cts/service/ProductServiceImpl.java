@@ -44,7 +44,10 @@ import java.time.Duration;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
+	
+	@Autowired
+	SNSService snsService;
+	
     @Autowired
     ProductRepository productRepository;
     @Autowired
@@ -115,6 +118,7 @@ List<ProductViewDTO> allProducts = productViewRepo.findAll();
     public Products addProduct(String name, String description, MultipartFile imageFile, Boolean isActive) throws IOException {
         String s3Key = uploadFileToS3(imageFile);
         String imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s%s", bucketName, s3KeyPrefix, s3Key);
+        snsService.notifyOnAddProduct();
         Products product = new Products();
         product.setName(name);
         product.setDescription(description);
