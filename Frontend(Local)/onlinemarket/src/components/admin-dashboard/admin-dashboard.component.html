@@ -81,7 +81,9 @@
   <div class="popup">
     <h3>Update Product</h3>
     <input type="text" [(ngModel)]="product.name" placeholder="Search Product by Product Name" />
-    <button (click)="searchProduct()">Search</button> <button type="button" (click)="closeUpdateProductPopup()">Cancel</button>
+    <div class="button-group1">
+      <button (click)="searchProduct()">Search</button> <button type="button" (click)="closeUpdateProductPopup()">Cancel</button>
+    </div>
 
     <form *ngIf="productFound" (ngSubmit)="updateProduct()" #updateForm="ngForm">
       <img *ngIf="previewImage" [src]="previewImage" alt="Product Image"
