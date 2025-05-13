@@ -1,10 +1,12 @@
 package com.cts.service;
 
 import com.cts.dto.UserAdminDTO;
+
 import com.cts.entity.ProductSubscription;
 import com.cts.entity.Products;
 import com.cts.entity.ReviewsAndRatings;
 import com.cts.entity.User;
+import com.cts.exception.InvalidInputException;
 import com.cts.exception.UserNotFoundException;
 import com.cts.mapper.UserAdminMapper;
 import com.cts.repository.ProductRepository;
@@ -125,14 +127,22 @@ public class UserAdminService {
 	}
 
 	public List<ProductSubscription> getSubscriptionsByEmail(String email) {
-		User user = userRepository.findByEmail(email);
-		if (user == null) {
-			throw new UserNotFoundException("User not found with email: " + email);
-		}
-		return user.getProductSubscriptionList();
+		if (email == null || email.trim().isEmpty()) {
+            throw new InvalidInputException("Email parameter cannot be null or empty.");
+        }
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+        return user.getProductSubscriptionList();
 	}
 
 	public List<ReviewsAndRatings> getReviewsByEmail(String email) {
+		
+		if (email == null || email.trim().isEmpty()) {
+            throw new InvalidInputException("Email parameter cannot be null or empty.");
+        }
+		
 		User user = userRepository.findByEmail(email);
 		if (user == null) {
 			throw new UserNotFoundException("User not found with email: " + email);

@@ -11,8 +11,11 @@ import java.util.stream.Collectors;
  
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.cts.dto.RequestDTO;
 import com.cts.dto.ResetPasswordDTO;
 import com.cts.dto.ResponseDTO;
@@ -264,11 +267,9 @@ public class UserService {
     public String verifyEmail(String email)
     {
         User user = userRepository.findByEmail(email);
-        if (user == null)
-        {
-            return "User not found!";
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
         }
- 
         user.setEmailVerification(true);
         user.setActive(true);
         userRepository.save(user);
