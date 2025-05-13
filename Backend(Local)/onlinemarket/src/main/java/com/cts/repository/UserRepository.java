@@ -17,12 +17,15 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Integer>{
 
 	User findByEmail(String email);
+	//Optional<User> findByEmail(String email);
 	
     boolean existsByEmail(String email);
     
     @Query("SELECT u.email FROM User u WHERE u.email = :email")
     String searchByEmail(@Param("email") String email);
     
+    
     List<User> findByIsActive(boolean isActive);
+
 	
 }

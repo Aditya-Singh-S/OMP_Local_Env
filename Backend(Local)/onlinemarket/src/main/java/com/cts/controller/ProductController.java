@@ -14,11 +14,14 @@ import com.cts.exception.InvalidProductException;
 import com.cts.exception.InvalidSubscriptionException;
 import com.cts.entity.ProductSubscription;
 import com.cts.service.ProductService;
+import com.cts.service.SNSService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,11 +30,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.constraints.Positive;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+
 
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:3000")
@@ -39,6 +45,9 @@ import org.springframework.core.io.Resource;
 @Validated
 public class ProductController {
 
+	@Autowired
+	SNSService snsService;
+	
     private final ProductService productService;
 
     @Autowired
@@ -49,13 +58,22 @@ public class ProductController {
     // API call for adding new Product
     @PostMapping("/admin/addProduct")
     public ResponseEntity<Products> createNewProduct(
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("imageFile") MultipartFile file,
-            @RequestParam(required = false, value = "isActive") Boolean isActive) throws IOException {
+            @RequestParam(value="name", required=true) String name,
+            @RequestParam(value="description", required=true) String description,
+            @RequestParam(value="imageFile", required=true) MultipartFile file,
+            @RequestParam(value = "isActive", required=true) Boolean isActive) throws IOException {
         Products newProduct = productService.addProduct(name, description, file, isActive);
+        snsService.notifyOnAddProduct();
         return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
     }
+    
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
+        String name = ex.getParameterName();
+        return new ResponseEntity<>("Validation Error: '" + name + "' field is required.", HttpStatus.BAD_REQUEST);
+    }
+
+
 
     @GetMapping("/viewAllProducts")
     public ResponseEntity<List<ProductViewDTO>> viewAllProducts() {
@@ -167,5 +185,20 @@ public class ProductController {
 //          return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 //      }
 //  }
+    
+    @PostMapping("/admin/uploadMultipleRecords")
+    public ResponseEntity<List<Products>> uploadMultipleProducts(@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
+        if (file.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            List<Products> uploadedProducts = productService.addMultipleProducts(file,bulkProductisactive);
+            return new ResponseEntity<>(uploadedProducts, HttpStatus.CREATED);
+        } catch (IOException e) {
+            System.err.println("Error processing Excel file: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

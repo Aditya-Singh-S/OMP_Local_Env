@@ -17,7 +17,7 @@ import { ProductReviewComponent } from "../product-review/product-review.compone
     RouterModule,
     ProductSubscriptionsComponent,
     ProductReviewComponent
-],
+  ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,9 +29,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
   currentPhotoUrl: string | null = null;
   userId: number | null = null;
   userIdSubscription: Subscription | undefined;
+  private hasPhotoBeenRemoved: boolean = false; // Track if the photo has been removed
   @ViewChild(ProductSubscriptionsComponent) productSubscriptionsPopup!: ProductSubscriptionsComponent;
   @ViewChild(ProductReviewComponent) productReviewsPopup!: ProductReviewComponent;
 
+  // New properties for the popup
+  showPopup: boolean = false;
+  popupTitle: string = '';
+  popupMessage: string = '';
+  popupType: 'success' | 'error' = 'success'; // You can extend this type
 
   constructor(
     private fb: FormBuilder,
@@ -90,10 +96,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
           });
           this.currentPhotoUrl = profileData.photo;
           console.log('Current Photo URL:', this.currentPhotoUrl);
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error loading profile:', error);
+          this.popupTitle = 'Error';
+          this.popupMessage = 'Failed to load profile data.';
+          this.popupType = 'error';
+          this.showPopup = true;
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -122,6 +133,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.currentPhotoUrl = e.target.result;
+          this.hasPhotoBeenRemoved=false;
           this.cdr.detectChanges(); // Manually trigger change detection for OnPush
         };
         reader.readAsDataURL(file);
@@ -135,12 +147,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
       photoInput.value = '';
       this.photoError = '';
       this.currentPhotoUrl = null;
-      this.cdr.detectChanges(); // Manually trigger change detection for OnPush
+      this.hasPhotoBeenRemoved=true;
+      this.cdr.detectChanges(); 
     }
   }
 
   onSubmit(): void {
+
     console.log('onSubmit() called'); // Diagnostic log
+    // Check if a photo is required and if it has been removed without a new one being selected
+    if (!this.currentPhotoUrl && this.hasPhotoBeenRemoved) {
+      this.photoError = 'Please select a photo.';
+      return; // Stop the submission
+    } else {
+      this.photoError = ''; // Clear any previous photo error if a photo exists or wasn't removed
+    }
+    
     if (this.profileForm.valid && !this.photoError && this.userId) {
       const formData = new FormData();
       formData.append('firstName', this.profileForm.get('firstName')?.value || '');
@@ -162,23 +184,41 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.userService.updateUser(this.userId, formData).subscribe({
         next: (response) => {
           console.log('Profile updated successfully:', response);
-          alert('Profile updated successfully!');
+          this.popupTitle = 'Success';
+          this.popupMessage = 'Profile updated successfully!';
+          this.popupType = 'success';
+          this.showPopup = true;
+          this.cdr.detectChanges();
           this.loadUserProfile();
         },
         error: (err) => {
           console.error('Profile update failed:', err);
-          alert(`Profile update failed: ${err.message}`);
+          this.popupTitle = 'Error';
+          this.popupMessage = `Profile update failed: ${err.message}`;
+          this.popupType = 'error';
+          this.showPopup = true;
+          this.cdr.detectChanges();
         }
       });
     }
   }
 
+
+  closePopup() {
+    this.showPopup = false;
+    this.cdr.detectChanges();
+  }
+
+
   openSubscriptions(): void {
-    console.log('openSubscriptions() called'); // Diagnostic log
+    console.log('openSubscriptions() called');
     this.productSubscriptionsPopup.openSubscriptionPopup();
   }
 
-    openReviewPopup(): void {
-      this.productReviewsPopup.openReviewPopup();
-    }
+
+
+  openReviewPopup(): void {
+    this.productReviewsPopup.openReviewPopup();
+  }
 }
+

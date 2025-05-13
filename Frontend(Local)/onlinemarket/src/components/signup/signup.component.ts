@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 
 import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
  
 @Component({
 
@@ -37,8 +38,12 @@ export class SignupComponent {
   potentiallyDuplicateEmails: string[] = [];
 
   destroy$ = new Subject<void>();
+  showPopup: boolean = false;
+  popupTitle: string = '';
+  popupMessage: string = '';
+  popupType: 'success' | 'error' = 'success';
  
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
+  constructor(private fb: FormBuilder, private userService: UserService, private authService: AuthService, private router: Router) {
 
     this.signUpForm = this.fb.group({
 
@@ -48,23 +53,11 @@ export class SignupComponent {
 
       nickName: ['', [Validators.required, Validators.pattern(/^(?=.*[a-zA-Z])[a-zA-Z0-9._]{3,15}$/)]],
 
-      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.(com|net|org)$/)]],
+      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z.0-9]+@[a-zA-Z0-9]+\.(com|net|org)$/)]],
 
       contactNo: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
 
-      password: [
-
-        '',
-
-        [
-
-          Validators.required,
-
-          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/)
-
-        ]
-
-      ],
+      password: ['',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/)]],
 
       confirmPassword: ['', [Validators.required]],
 
@@ -87,8 +80,6 @@ export class SignupComponent {
         this.signUpForm.get('email')?.setErrors({ 'potentialDuplicate': true });
 
       } else if (this.signUpForm.get('email')?.errors?.['potentialDuplicate']) {
-
-        // Clear the potentialDuplicate error if the email changes to something new
 
         const currentErrors = { ...this.signUpForm.get('email')?.errors };
 
@@ -180,8 +171,6 @@ onSubmit(): void {
   if (this.signUpForm.valid && !this.photoError) {
 
     const formData = new FormData();
- 
-    // Append each field individually
 
     formData.append('firstName', this.signUpForm.get('firstName')?.value || '');
 
@@ -199,11 +188,9 @@ onSubmit(): void {
 
     formData.append('postalCode', this.signUpForm.get('postalCode')?.value || '');
 
-    formData.append('contactNumber', this.signUpForm.get('contactNo')?.value || ''); // Ensure "contactNumber" matches the backend
+    formData.append('contactNumber', this.signUpForm.get('contactNo')?.value || ''); 
 
     formData.append('dateOfBirth', this.signUpForm.get('dob')?.value || '');
- 
-    // Append the file
 
     const photoInput = (document.getElementById('photo') as HTMLInputElement);
 
@@ -211,54 +198,36 @@ onSubmit(): void {
 
       formData.append('imageFile', photoInput.files[0]);
 
+    }else{
+      this.photoError = 'Photo is required.';
     }
  
     console.log(Array.from(formData.entries())); // Debugging log
- 
-    this.userService.register(formData).subscribe({
 
-      next: (response) => {
-
-        console.log('Registration successful:', response)
-
-        this.router.navigate(['/signin']).then(() => {
-
-          window.location.reload();
-
-        });
-
-        alert('Registration successful! Please check your email for verification.');
-
-      },
-
-      error: (err) => {
-
-        console.error('Registration failed:', err);
-
-        if (err?.error?.message === 'Duplicate email: Email already exists in the database.') {
-
-          this.signUpForm.get('email')?.setErrors({ 'potentialDuplicate': true });
-
-          // Store this email as a potential duplicate for the current session
-
-          if (!this.potentiallyDuplicateEmails.includes(this.signUpForm.get('email')?.value)) {
-
-            this.potentiallyDuplicateEmails.push(this.signUpForm.get('email')?.value);
-
-          }
-
-        } else {
-
-          this.emailError = '* Registration failed. Please try again later.';
-
-        }
-
-      }
- 
+    //Auth to cognito
+    const email = this.signUpForm.get('email')?.value;
+    const password = this.signUpForm.get('password')?.value;
+    localStorage.setItem('userEmail', email);
+    this.authService.signUp(email, password).then(result => {
+      console.log('User registered:', result);
+      alert("Registration Successful! Check for email verification");
+      this.userService.register(formData).subscribe({
+        next: (response) => {
+          console.log('User registered in database:', response)
+          alert('User stored in database successful! Please check your db.');
+        },
+        error: (err) => console.error('User registration in database failed:', err)
+      });
+      this.router.navigate(['/verify-email']);
+    }).catch(err => {
+      console.error("Registration failed:",err);
+      alert('Error:'+ err.message);
     });
-
+    
   }
-
+}
+closePopup() {
+  this.showPopup = false;
 }
  
 }
