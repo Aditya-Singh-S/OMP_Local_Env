@@ -21,8 +21,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.cts.entity.ProductSubscription;
 import com.cts.entity.Products;
 import com.cts.entity.User;
@@ -48,7 +51,10 @@ import java.time.Duration;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
+	
+	@Autowired
+	SNSService snsService;
+	
     @Autowired
     ProductRepository productRepository;
     @Autowired
@@ -124,9 +130,7 @@ public class ProductServiceImpl implements ProductService {
     public Products addProduct(String name, String description, MultipartFile imageFile, Boolean isActive) throws IOException {
     	
         final int MAX_NAME_LENGTH = 255;
-        //final List<String> SUPPORTED_FILE_TYPES = Arrays.asList("jpg", "jpeg", "png", "gif");
- 
-        // Validation checks
+
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Validation Error: 'name' field is required.");
         }
@@ -136,7 +140,14 @@ public class ProductServiceImpl implements ProductService {
         if (isActive == null) {
             throw new IllegalArgumentException("Validation Error: 'isActive' field is required.");
         }
-        
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new IllegalArgumentException("validation Error: 'imageFile' field is required.");
+        }
+        String contentType = imageFile.getContentType();
+        if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType) && !"image/jpg".equals(contentType)) {
+        throw new IllegalArgumentException("Validation Error: Only JPEG, JPG and PNG image files are allowed.");
+        }
+
         
         String sanitizedProductName = name.replaceAll("\\s+", "_"); 
         String fileExtension = getFileExtension(imageFile.getContentType()); 

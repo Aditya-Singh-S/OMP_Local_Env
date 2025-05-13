@@ -1,6 +1,6 @@
 
 
-<div class="container">
+<!-- <div class="container">
     <div class="reset-password">
         <form [formGroup]="resetPasswordForm" (ngSubmit)="resetPassword()">
             <h2>Reset Password</h2>
@@ -42,4 +42,34 @@
             <button type="submit" class="submit" [disabled]="resetPasswordForm.invalid">Reset Password</button>
         </form>
     </div>
-</div>
+</div> -->
+
+
+<div class="container">
+    <div class="reset-password">
+    <h2>Reset Password</h2>
+     
+            <p class="email-display" *ngIf="email"> {{ email }} </p>
+     
+            <form (ngSubmit)="resetPassword()">
+    <div class="row">
+    <div class="column">
+    <h1></h1>
+     
+    <!-- <input type="text" [(ngModel)]="verificationCode" name="code" placeholder="VerificationkkCode" required /> -->
+    <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="New Password" required />
+    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Confirm password" required />
+    </div>
+    </div>
+     
+                <re-captcha (resolved)="onCaptchaResolved($event)"
+                siteKey="6Lf_uRMrAAAAAMXgbKvXDk9Mmwza9GaZY3bvoRFG"></re-captcha>
+     
+                <button type="submit" class="submit"> Reset Password </button>
+    </form>
+    </div>
+    </div>
+     
+ 
+
+

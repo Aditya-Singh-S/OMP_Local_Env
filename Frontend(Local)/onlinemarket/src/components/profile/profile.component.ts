@@ -203,15 +203,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+
   closePopup() {
     this.showPopup = false;
     this.cdr.detectChanges();
   }
 
+
   openSubscriptions(): void {
     console.log('openSubscriptions() called');
     this.productSubscriptionsPopup.openSubscriptionPopup();
   }
+
+
 
   openReviewPopup(): void {
     this.productReviewsPopup.openReviewPopup();

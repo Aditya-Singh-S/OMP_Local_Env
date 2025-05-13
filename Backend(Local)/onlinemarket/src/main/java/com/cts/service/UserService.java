@@ -11,8 +11,11 @@ import java.util.stream.Collectors;
  
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.cts.dto.RequestDTO;
 import com.cts.dto.ResetPasswordDTO;
 import com.cts.dto.ResponseDTO;
@@ -43,7 +46,8 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
  
 @Service
 public class UserService {
- 
+	@Autowired
+	SNSService snsService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -212,6 +216,7 @@ public class UserService {
         userValidationService.validate(user);
         user.setPassword(util.hashPassword(user.getPassword()));
         User savedUser = userRepository.save(user);
+        snsService.subscribeUser(user.getEmail());
         return userMapper.toDTO(savedUser);
     }
  
@@ -262,11 +267,9 @@ public class UserService {
     public String verifyEmail(String email)
     {
         User user = userRepository.findByEmail(email);
-        if (user == null)
-        {
-            return "User not found!";
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
         }
- 
         user.setEmailVerification(true);
         user.setActive(true);
         userRepository.save(user);

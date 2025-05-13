@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +38,7 @@ import com.cts.dto.SignInResponse;
 import com.cts.entity.User;
 import com.cts.exception.UserNotFoundException;
 import com.cts.service.ProductService;
+import com.cts.service.SNSService;
 import com.cts.service.UserService;
 
 
@@ -49,6 +52,9 @@ import com.cts.service.UserValidationService;
 @CrossOrigin(origins = "http://127.0.0.1:3000")
 @Validated
 public class UserController {
+	@Autowired
+	SNSService snsService;
+	
     @Autowired
     private UserService userService;
     @Autowired
@@ -98,6 +104,7 @@ public class UserController {
         requestDTO.setDateOfBirth(dateOfBirth); // Pass String
  
         ResponseDTO responseDTO = userService.createUser(requestDTO, imageFile);
+        
         return ResponseEntity.ok(responseDTO);
     }
  
@@ -188,6 +195,11 @@ public class UserController {
     @PostMapping("/verify-email")
     public String verifyEmail(@RequestParam String email) {
         return userService.verifyEmail(email);
+    }
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
+        String email = ex.getParameterName();
+        return new ResponseEntity<>("Validation Error: '" + email + "' field is required.", HttpStatus.BAD_REQUEST);
     }
  
    
