@@ -64,6 +64,7 @@ export class SigninComponent implements OnInit {
         this.loginSuccess.emit(); // Emit event on successful login
         this.userService.handleLoginSuccess(this.userEmailId);
         this.router.navigate(['/home']);
+        
       },
       error: (error) => {
         let errorMessage = error.error?.message || 'An unexpected error occurred';

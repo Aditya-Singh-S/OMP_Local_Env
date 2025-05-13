@@ -215,5 +215,7 @@ public class UserController {
     public List<ProductViewDTO> getProductSubscriptionList(@RequestParam int userId){
     	return productService.getProductSubscriptionList(userId);
     }
+    
+    
 }
  

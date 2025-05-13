@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class AuthService {
     private loginUrl = 'http://127.0.0.1:3000/OMP/login';
-    private generateResetLinkUrl = 'http://127.0.0.1:3000/OMPOMP/generate-reset-link';
+    private generateResetLinkUrl = 'http://127.0.0.1:3000/OMP/generate-reset-link';
     private apiUrl = 'http://127.0.0.1:3000/OMP/reset-password';
 
     private loggedInSource = new BehaviorSubject<boolean>(false);
@@ -16,11 +16,13 @@ export class AuthService {
 
     constructor(private http: HttpClient) {}
 
-    login(email: string, password: string): Observable<any> {
+    login(email: string, password: string): Observable<any> 
+    {
         return this.http.post<any>(this.loginUrl, { email, password });
     }
 
-    forgotPassword(email: string): Observable<string> {
+    forgotPassword(email: string): Observable<string> 
+    {
         const params = new HttpParams().set('email', email);
         return this.http.post(this.generateResetLinkUrl, {}, { params, responseType: 'text' });
     }

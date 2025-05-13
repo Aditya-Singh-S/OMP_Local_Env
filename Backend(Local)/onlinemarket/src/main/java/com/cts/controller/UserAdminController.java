@@ -165,7 +165,7 @@ public class UserAdminController {
             .body(excelFile);
     }
     
-    //geting al user
+    //getting all user
     @GetMapping("/admin/users")
     public ResponseEntity<List<UserDetailDTO>> getAllUsersForAdmin() {
         List<User> users = userAdminService.getAllUsers();

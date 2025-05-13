@@ -45,7 +45,7 @@ export class ForgotPageComponent implements OnInit {
     this.authService.forgotPassword(email).subscribe({
       next: (resetLink: string) => {
         console.log("Reset Link Generated:", resetLink);
-        alert("Reset link has been generated in the console.");
+        alert("Reset link has been generated");
         this.message = "";
         this.forgotForm.reset();
       },
