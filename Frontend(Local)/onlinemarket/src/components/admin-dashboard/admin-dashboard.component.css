@@ -102,7 +102,12 @@ button {
 
 .popup .button-group {
   display: flex;
-  justify-content: space-between;
+  justify-content:space-between;
+}
+
+.popup .button-group1 {
+  display: flex;
+  justify-content:space-around;
 }
 
 .popup .button-group button {
@@ -117,6 +122,12 @@ button {
 
 .button-group {
   margin-top: 10px;
+  justify-content:flex-start;
+}
+
+.button-group1 {
+  margin-top: 10px;
+  justify-content:flex-start;
 }
 
 /* Styles for the popup overlay */
