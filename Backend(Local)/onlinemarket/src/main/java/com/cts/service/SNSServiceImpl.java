@@ -1,6 +1,7 @@
 package com.cts.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,49 @@ public class SNSServiceImpl implements SNSService {
 				.topicArn(TOPIC_ARN).build();
 		
 		snsClient.publish(publishRequest);
+		
+	}
+
+
+	@Override
+	public void notifyUserOnUpdateProduct(List<String> userEmails) {
+		// TODO Auto-generated method stub
+		
+		String message = "Hey User!! The product you have subscribed has been updated by Admin.";
+		
+		for(String email: userEmails) {
+			Map<String, MessageAttributeValue> attributes = Map.of(
+		            "recipient", MessageAttributeValue.builder()
+		                .dataType("String")
+		                .stringValue(email).build());
+			
+			PublishRequest requests = PublishRequest.builder().message(message)
+					.topicArn(TOPIC_ARN)
+					.messageAttributes(attributes)
+					.build();
+			
+			snsClient.publish(requests);
+		}
+		
+	}
+
+
+	@Override
+	public void notifyAdminOnUpdateProduct() {
+		
+		String message = "Attention ADMIN Group!! Someone just updated the product!!";
+		
+		Map<String, MessageAttributeValue> attribute = Map.of(
+	            "recipient", MessageAttributeValue.builder()
+	                .dataType("String")
+	                .stringValue("ADMIN").build());
+		
+		PublishRequest request = PublishRequest.builder().message(message)
+				.topicArn(TOPIC_ARN)
+				.messageAttributes(attribute)
+				.build();
+		
+		snsClient.publish(request);
 		
 	}
 
