@@ -51,7 +51,10 @@ import java.time.Duration;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
+	
+	@Autowired
+	SNSService snsService;
+	
     @Autowired
     ProductRepository productRepository;
     @Autowired
