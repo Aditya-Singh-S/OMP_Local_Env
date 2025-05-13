@@ -216,5 +216,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   openReviewPopup(): void {
     this.productReviewsPopup.openReviewPopup();
   }
+
+  
 }
 
