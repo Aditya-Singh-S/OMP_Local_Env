@@ -101,6 +101,8 @@ public class ProductServiceImpl implements ProductService {
                         dto.setName(product.getName());
                         dto.setDescription(product.getDescription());
                         dto.setImageUrl(product.getImageUrl());
+                        dto.setSubscription_count(this.getSubscriptionList(product.getProductid()).size());
+                       
                         return dto;
                     })
                     .collect(Collectors.toList());

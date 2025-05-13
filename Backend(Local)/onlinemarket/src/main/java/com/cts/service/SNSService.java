@@ -7,4 +7,6 @@ public interface SNSService {
 	void notifyOnAddProduct();
 	void notifyUserOnUpdateProduct(List<String> userEmails);
 	void notifyAdminOnUpdateProduct();
+	void notifyReviewCreated(String userEmail, String productName, double rating, String review);
+    void notifyReviewDeleted(String userEmail, String productName, double rating, String review);
 }
