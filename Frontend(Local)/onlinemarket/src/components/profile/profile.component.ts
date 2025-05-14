@@ -190,6 +190,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.showPopup = true;
           this.cdr.detectChanges();
           this.loadUserProfile();
+          window.location.reload();
         },
         error: (err) => {
           console.error('Profile update failed:', err);

@@ -29,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.cts.entity.ProductSubscription;
 import com.cts.entity.Products;
 import com.cts.entity.User;
+import com.cts.enums.UserRole;
 import com.cts.repository.ProductRepository;
 import com.cts.repository.ProductViewRepository;
 import com.cts.repository.UserRepository;
@@ -100,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
                         dto.setName(product.getName());
                         dto.setDescription(product.getDescription());
                         dto.setImageUrl(product.getImageUrl());
-                        
+                        dto.setSubscription_count(this.getSubscriptionList(product.getProductid()).size());
                         return dto;
                     })
                     .collect(Collectors.toList());
@@ -189,6 +190,15 @@ public class ProductServiceImpl implements ProductService {
         if (isActive != null) {
             product.setIsActive(isActive);
         }
+        
+        List<String> userEmails = getSubscriptionList(product.getProductid()).stream()
+        		.filter(subscription -> subscription.getUser().getUserRole()== UserRole.USER)
+        		.map(subscription -> subscription.getUser().getEmail())
+        		.collect(Collectors.toList());
+        
+        snsService.notifyAdminOnUpdateProduct();
+        snsService.notifyUserOnUpdateProduct(userEmails);
+    
         return productRepository.save(product);
     }
 
