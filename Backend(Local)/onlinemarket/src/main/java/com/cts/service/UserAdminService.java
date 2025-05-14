@@ -43,6 +43,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserAdminService {
+	
+	@Autowired
+	SNSService snsService;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -190,6 +193,11 @@ public class UserAdminService {
 
 		subscription.setOptIn(optInStatus);
 		subscription.setUpdatedOn(LocalDateTime.now());
+		if(optInStatus==false) {
+			Products product = productRepository.findById(subscription.getProducts().getProductid()).orElseThrow(() -> new RuntimeException("Product not found"));
+			snsService.notifyAdminOnUnSubscription(product.getName(),user.getEmail());
+			snsService.notifyUserOnUnSubscription(user.getNickName(),product.getName(),user.getEmail());
+		}
 		productRepository.save(subscription.getProducts());
 		return subscription;
 	}
