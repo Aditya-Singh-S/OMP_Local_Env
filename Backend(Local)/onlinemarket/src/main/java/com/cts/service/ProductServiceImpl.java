@@ -272,6 +272,9 @@ public class ProductServiceImpl implements ProductService {
         subscription.setUser(user);
         subscription.setProducts(product);
         product.getProductSubscriptionList().add(subscription);
+        
+        snsService.notifyOnSubscribing(user.getEmail(), user.getNickName(), product.getName());
+        
         return productRepository.save(product);
     }
 
@@ -291,6 +294,9 @@ public class ProductServiceImpl implements ProductService {
         existingSubscription.get().setOptIn(false);
         existingSubscription.get().setUpdatedOn(LocalDateTime.now());
         productRepository.save(product);
+        
+        snsService.notifyOnUnSubscribing(user.getEmail(), user.getNickName(), product.getName());
+        
         return product;
     }
 

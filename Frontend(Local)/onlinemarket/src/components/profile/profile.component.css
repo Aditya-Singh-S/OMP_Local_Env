@@ -32,6 +32,9 @@ input {
   width: fit-content;
   max-width: 300px;
   margin-bottom: 20px;
+  margin-top: 0px;
+  margin-top: 0px;
+
 }
 
 input:focus {
@@ -66,6 +69,7 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    margin-top: 17px;
 }
  
 button:hover {
@@ -183,3 +187,21 @@ button:hover {
     }
 }
  
+/* New CSS for button positioning */
+button[type="button"][ng-click="openSubscriptions()"] {
+    margin-top: 0px; /* Adjust as needed */
+    display: block;
+    width: calc(100% - 20px);
+}
+ 
+button[type="button"][ng-click="openReviewPopup()"] {
+    margin-top: 0px; /* Adjust as needed */
+    display: block;
+    width: calc(100% - 20px);
+}
+ 
+button[type="submit"] {
+    margin-top: 29px; /* Adjust as needed */
+    display: block;
+    width: calc(100% - 20px);
+}
