@@ -53,6 +53,11 @@ button {
   box-shadow: 2px 2px 0 #87cefa;
 }
 
+input.ng-invalid.ng-touched {
+  border: 1px solid red;
+}
+
+
 .admindivider {
   width: 3px;
   background-color: #3333cc;

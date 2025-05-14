@@ -64,4 +64,23 @@ public class SNSServiceImpl implements SNSService {
 		snsClient.publish(publishRequest);
 		
 	}
+	
+	public void userEmailVerify(String email)
+	{
+		String message = "Hey Please reset your passowrd using the below link  http://online-marketplace-bucket.s3-website-us-east-1.amazonaws.com/forgot-page";
+		
+		
+		System.out.println("Forget Password");
+		Map<String, MessageAttributeValue> attributes = Map.of(
+	            "recipient", MessageAttributeValue.builder()
+	                .dataType("String")
+	                .stringValue(email).build());
+		
+		PublishRequest publishRequest = PublishRequest.builder().message(message)
+				.messageAttributes(attributes)
+				.topicArn(TOPIC_ARN).build();
+		
+		snsClient.publish(publishRequest);
+	}
+	
 }
