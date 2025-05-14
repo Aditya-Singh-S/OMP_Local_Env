@@ -47,5 +47,7 @@ public class ReviewsAndRatings {
     private Timestamp reviewUpdateOn;
     
     //private Timestamp reviewDeletedOn;
+    
+    
 
 }

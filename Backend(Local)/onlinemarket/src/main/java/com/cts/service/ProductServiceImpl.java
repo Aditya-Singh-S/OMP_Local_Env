@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
     @Value("${aws.s3.keyPrefix}")
     private String s3KeyPrefix;
  
-//   
+  
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
@@ -102,12 +102,22 @@ public class ProductServiceImpl implements ProductService {
                         dto.setDescription(product.getDescription());
                         dto.setImageUrl(product.getImageUrl());
                         dto.setSubscription_count(this.getSubscriptionList(product.getProductid()).size());
-                       
                         return dto;
                     })
                     .collect(Collectors.toList());
         }
     }
+    
+//    public List<ProductViewDTO> viewAllProducts() {
+//    	
+//    	List<ProductViewDTO> allProducts = productViewRepo.findAll();
+//    	    	
+//    	    	if (allProducts == null || allProducts.isEmpty()) {
+//    	          throw new InvalidProductException("No products available to display.");
+//    	    	} else {
+//    	    		return allProducts;
+//    	    	}
+//    }
 
     	
    
@@ -326,6 +336,82 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+//    @Override
+//    public List<ProductViewDTO> readProductsFromXlsx(MultipartFile file) throws IOException {
+//        List<ProductViewDTO> productDTOs = new ArrayList<>();
+//        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+//            Sheet sheet = workbook.getSheetAt(0);
+//            for (Row row : sheet) {
+//                if (row.getRowNum() == 0)
+//                    continue;
+//                ProductViewDTO productDTO = new ProductViewDTO();
+//                productDTO.setName(row.getCell(0).getStringCellValue());
+//                productDTO.setDescription(row.getCell(1).getStringCellValue());
+//                // Assuming the local image path is in the third column (index 2)
+//                String localImagePath = row.getCell(2).getStringCellValue();
+//                productDTO.setLocalImagePath(localImagePath);
+//                productDTOs.add(productDTO);
+//            }
+//        }
+//        return productDTOs;
+//    }
+
+//    @Override
+//    public List<ProductUploadDTO> readProductsFromXlsx(MultipartFile file) throws IOException {
+//        List<ProductUploadDTO> uploadDTOs = new ArrayList<>();
+//        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+//            Sheet sheet = workbook.getSheetAt(0);
+//            for (Row row : sheet) {
+//                if (row.getRowNum() == 0)
+//                    continue;
+//                ProductUploadDTO uploadDTO = new ProductUploadDTO();
+//                uploadDTO.setName(row.getCell(0).getStringCellValue());
+//                uploadDTO.setDescription(row.getCell(1).getStringCellValue());
+//                try {
+//                    uploadDTO.setLocalImagePath(row.getCell(2).getStringCellValue());
+//                } catch (Exception e) {
+//                    System.err.println("Error reading local image path from Excel: " + e.getMessage());
+//                    uploadDTO.setLocalImagePath(null);
+//                }
+//                uploadDTOs.add(uploadDTO);
+//            }
+//        }
+//        return uploadDTOs; // Directly return List<ProductUploadDTO>
+//    }
+
+//    @Override
+//    public List<Products> saveProducts(List<ProductUploadDTO> uploadDTOs) { // Expect List<ProductUploadDTO>
+//        List<Products> allProduct = new ArrayList<>();
+//        for (ProductUploadDTO uploadDTO : uploadDTOs) {
+//            Products product = new Products();
+//            product.setName(uploadDTO.getName());
+//            product.setDescription(uploadDTO.getDescription());
+//
+//            String localImagePath = uploadDTO.getLocalImagePath();
+//            String s3ImageUrl = null;
+//
+//            if (localImagePath != null && !localImagePath.trim().isEmpty()) {
+//                Path localFile = Paths.get(localImagePath);
+//                if (Files.exists(localFile)) {
+//                    try {
+//                        String fileName = localFile.getFileName().toString();
+//                        String s3Key = uploadFileToS3(localFile, fileName);
+//                        s3ImageUrl = String.format("https://%s.s3.amazonaws.com/%s%s", bucketName, s3KeyPrefix, fileName);
+//                    } catch (IOException e) {
+//                        System.err.println("Error uploading image from " + localImagePath + " to S3: " + e.getMessage());
+//                        // Handle the error appropriately
+//                    }
+//                } else {
+//                    System.err.println("Local image file not found at: " + localImagePath);
+//                    // Handle the case where the local file doesn't exist
+//                }
+//            }
+//            product.setImageUrl(s3ImageUrl); // Set the S3 URL (or null if upload failed)
+//            allProduct.add(product);
+//        }
+//        productRepository.saveAll(allProduct);
+//        return allProduct;
+//    }
     
     @Override
     public List<Products> addMultipleProducts(MultipartFile file,boolean bulkProductisactive) throws IOException {

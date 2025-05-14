@@ -24,8 +24,8 @@ public class ResponseDTO {
     private String addressLine2;
     private String postalCode;
     private String contactNumber;
-    private String dateOfBirth; // Now a String
-    private String photo; // Typically, you'd use a URL instead of binary data
+    private String dateOfBirth; 
+    private String photo; 
     private UserRole userRole;
     private boolean emailVerification;
     private boolean isActive;
