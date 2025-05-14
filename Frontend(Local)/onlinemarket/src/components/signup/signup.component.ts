@@ -202,9 +202,8 @@ onSubmit(): void {
       this.photoError = 'Photo is required.';
     }
  
-    console.log(Array.from(formData.entries())); // Debugging log
+    console.log(Array.from(formData.entries())); 
 
-    //Auth to cognito
     const email = this.signUpForm.get('email')?.value;
     const password = this.signUpForm.get('password')?.value;
     localStorage.setItem('userEmail', email);

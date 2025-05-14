@@ -74,7 +74,7 @@ public class UserService {
     	
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
         this.s3Client = S3Client.builder()
-                .region(Region.US_EAST_1) // Replace with your AWS Region if different
+                .region(Region.US_EAST_1)
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                 .build();
         this.s3Presigner = S3Presigner.builder()
