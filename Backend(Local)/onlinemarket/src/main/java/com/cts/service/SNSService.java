@@ -7,6 +7,10 @@ public interface SNSService {
 	void subscribeUser(String email);
 	
 	void notifyOnAddProduct();
+
+	void notifyAdminOnUnSubscription(String productName,String userEmail);
+	void notifyUserOnUnSubscription(String nickName,String productName,String userEmail);
+
   
 	void userEmailVerify(String email);
   
@@ -21,6 +25,5 @@ public interface SNSService {
   void notifyOnSubscribing(String email, String nickName, String productName);
     
   void notifyOnUnSubscribing(String email, String nickName, String productName);
-
 
 }

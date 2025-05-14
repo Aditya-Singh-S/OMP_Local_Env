@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-OnlinemarketApplication<onlinemarket>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cts.OnlinemarketApplication",
+            "projectName": "onlinemarket",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -35,7 +35,7 @@ export class UserReviewComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     public userService: UserService // Inject UserService (make it public to access in the template)
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.productId = +this.route.snapshot.paramMap.get('id')!;
