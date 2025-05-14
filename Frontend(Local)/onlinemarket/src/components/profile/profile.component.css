@@ -9,7 +9,7 @@
     justify-content: center;
  
   }
- 
+
   .profile-photo img {
     width: 50px;
     height: 50px;
@@ -24,7 +24,16 @@ input {
     border-radius: 4px;
     box-sizing: border-box;
 }
- 
+.section-title {
+  background-color: rgb(1, 1, 118);
+  color: white;
+  padding: 10px;
+  font-size: 20px;
+  width: fit-content;
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+
 input:focus {
     border-color: #007BFF;
     outline: none;
