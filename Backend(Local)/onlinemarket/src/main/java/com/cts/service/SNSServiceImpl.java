@@ -1,6 +1,7 @@
 package com.cts.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,4 +84,119 @@ public class SNSServiceImpl implements SNSService {
 		snsClient.publish(publishRequest);
 	}
 	
-}
+
+
+
+	@Override
+	public void notifyUserOnUpdateProduct(List<String> userEmails) {
+		// TODO Auto-generated method stub
+		
+		String message = "Hey User!! The product you have subscribed has been updated by Admin.";
+		
+		for(String email: userEmails) {
+			Map<String, MessageAttributeValue> attributes = Map.of(
+		            "recipient", MessageAttributeValue.builder()
+		                .dataType("String")
+		                .stringValue(email).build());
+			
+			PublishRequest requests = PublishRequest.builder().message(message)
+					.topicArn(TOPIC_ARN)
+					.messageAttributes(attributes)
+					.build();
+			
+			snsClient.publish(requests);
+		}
+		
+	}
+
+
+	@Override
+	public void notifyAdminOnUpdateProduct() {
+		
+		String message = "Attention ADMIN Group!! Someone just updated the product!!";
+		
+		Map<String, MessageAttributeValue> attribute = Map.of(
+	            "recipient", MessageAttributeValue.builder()
+	                .dataType("String")
+	                .stringValue("ADMIN").build());
+		
+		PublishRequest request = PublishRequest.builder().message(message)
+				.topicArn(TOPIC_ARN)
+				.messageAttributes(attribute)
+				.build();
+		
+		snsClient.publish(request);
+		
+	}
+
+
+	@Override
+	public void notifyReviewCreated(String userEmail, String productName, double rating, String review) {
+		// TODO Auto-generated method stub
+		
+		Map<String, MessageAttributeValue> attributes = Map.of(
+	            "recipient", MessageAttributeValue.builder()
+	                .dataType("String")
+	                .stringValue(userEmail).build());
+		
+		
+		String subject = "New Review Posted!";
+        String message = String.format("""
+                Hello %s,
+
+                Thank you for posting a review for the product: %s.
+
+                Your review details are:
+                Rating: %.1f stars
+                Review: %s
+
+                We appreciate your feedback!
+                """, userEmail, productName, rating, review);
+
+        PublishRequest publishRequest = PublishRequest.builder()
+        		
+        		.topicArn(TOPIC_ARN)
+                .subject(subject)
+                .message(message)
+                .messageAttributes(attributes)
+                .build();
+
+        snsClient.publish(publishRequest);
+		
+	}
+
+
+	@Override
+	public void notifyReviewDeleted(String userEmail, String productName, double rating, String review) {
+		
+		Map<String, MessageAttributeValue> attributes = Map.of(
+	            "recipient", MessageAttributeValue.builder()
+	                .dataType("String")
+	                .stringValue(userEmail).build());
+		
+		String subject = "Review Deleted";
+        String message = String.format("""
+                Hello %s,
+
+                Your review for the product: %s has been successfully deleted.
+
+                Deleted review details:
+                Rating: %.1f stars
+                Review: %s
+
+                If you did not initiate this deletion, please contact our support team.
+                """, userEmail, productName, rating, review);
+
+        PublishRequest publishRequest = PublishRequest.builder()
+                .topicArn(TOPIC_ARN)
+                .subject(subject)
+                .message(message)
+                .messageAttributes(attributes)
+                .build();
+
+        snsClient.publish(publishRequest);
+    }
+		
+	}
+
+
