@@ -195,12 +195,15 @@ public class UserAdminService {
 
 		subscription.setOptIn(optInStatus);
 		subscription.setUpdatedOn(LocalDateTime.now());
+		
+		productRepository.save(subscription.getProducts());
+		
 		if(optInStatus==false) {
 			Products product = productRepository.findById(subscription.getProducts().getProductid()).orElseThrow(() -> new RuntimeException("Product not found"));
 			snsService.notifyAdminOnUnSubscription(product.getName(),user.getEmail());
 			snsService.notifyUserOnUnSubscription(user.getNickName(),product.getName(),user.getEmail());
 		}
-		productRepository.save(subscription.getProducts());
+		
 		return subscription;
 	}
 
