@@ -8,6 +8,8 @@ public interface SNSService {
 	
 	void notifyOnAddProduct();
 	
+	void userEmailVerify(String email);
+	
 	void notifyUserOnUpdateProduct(List<String> userEmails);
 	
 	void notifyAdminOnUpdateProduct();
@@ -19,4 +21,5 @@ public interface SNSService {
     void notifyOnSubscribing(String email, String nickName, String productName);
     
     void notifyOnUnSubscribing(String email, String nickName, String productName);
+
 }

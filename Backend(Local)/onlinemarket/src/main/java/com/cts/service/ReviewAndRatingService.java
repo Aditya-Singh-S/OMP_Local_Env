@@ -122,6 +122,13 @@ public class ReviewAndRatingService {
     }
 
 	public List<ReviewAndRatingDTO> getReviewsByProductId(int productid) {
+		
+		if(productid<=0)
+		{
+			throw new InvalidProductException("Please enter valid product Id");
+		}
+		Products product = productRepository.findById(productid)
+                .orElseThrow(() -> new InvalidProductException("Product not found with ID: " + productid));
 
 		List<ReviewsAndRatings> reviews = reviewRepository.findByProductsProductidOrderByRatingDesc(productid);
 		return reviews.stream().map(ReviewAndRatingDTO::new).collect(Collectors.toList());
