@@ -242,7 +242,7 @@ public class SNSServiceImpl implements SNSService {
 	}
 
 
-<<<<<<< HEAD
+
 	@Override
 	public void notifyOnUnSubscribing(String email, String nickName, String productName) {
 		// TODO Auto-generated method stub
@@ -271,5 +271,3 @@ public class SNSServiceImpl implements SNSService {
 	}
 
 
-=======
->>>>>>> 08dfabc2f82bd6acd8aa1123a78abca9eebaafc0

@@ -32,10 +32,9 @@ input {
   width: fit-content;
   max-width: 300px;
   margin-bottom: 20px;
-<<<<<<< HEAD
-=======
   margin-top: 0px;
->>>>>>> 08dfabc2f82bd6acd8aa1123a78abca9eebaafc0
+  margin-top: 0px;
+
 }
 
 input:focus {
