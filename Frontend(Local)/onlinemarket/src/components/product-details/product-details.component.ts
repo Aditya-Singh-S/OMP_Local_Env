@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { UserReviewComponent } from "../user-review/user-review.component";
 import { FormsModule } from '@angular/forms';
@@ -240,6 +240,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
           this.reviewDescription = "";
           this.rating = 0;
           this.closeReviewPopup(); // Close review popup on success
+          window.location.reload();
         },
         error: (error) => {
           console.error('Error adding review:', error);
