@@ -27,14 +27,14 @@ h3 {
 }
 
 .popup {
-    background-color: #E59EDD;
+    background-color: #e3c3df;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     width: 80%; /* Control the overall width of the popup */
     max-width: 600px;
     position: relative;
-    border: 2px solid purple;
+    border: 2px solid rgb(238, 169, 238);
     max-height: 80vh;
     overflow-y: auto;
 }
