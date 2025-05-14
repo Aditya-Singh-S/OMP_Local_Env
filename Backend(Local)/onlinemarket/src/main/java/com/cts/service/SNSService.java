@@ -9,10 +9,6 @@ public interface SNSService {
 	void notifyOnAddProduct();
   
 	void userEmailVerify(String email);
-
-	void userEmailVerify(String email);
-
-	void userEmailVerify(String email);
   
 	void notifyUserOnUpdateProduct(List<String> userEmails);
 	
