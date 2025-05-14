@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     @Value("${aws.s3.keyPrefix}")
     private String s3KeyPrefix;
  
-//   
+  
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
