@@ -192,6 +192,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.loadUserProfile();
           window.location.reload();
         },
+        
         error: (err) => {
           console.error('Profile update failed:', err);
           this.popupTitle = 'Error';
