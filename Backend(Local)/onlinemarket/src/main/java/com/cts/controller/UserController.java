@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -243,10 +245,32 @@ public class UserController {
     
      //get subscription list
     @GetMapping("/getProductSubscriptionList")
-    public List<ProductViewDTO> getProductSubscriptionList(@RequestParam int userId){
+    public List<ProductViewDTO> getProductSubscriptionList(
+    		@RequestHeader("Authorization") String authHeaders,
+    		@RequestParam int userId){
+    	
+    	this.checkAuthorizationHeaders(authHeaders);
     	return productService.getProductSubscriptionList(userId);
     }
     
+    
+    public void checkAuthorizationHeaders(String authHeaders) {
+    	if (authHeaders != null && authHeaders.startsWith("Basic ")) {
+            String base64Credentials = authHeaders.substring("Basic ".length());
+            byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
+            String decodedString = new String(decodedBytes);
+ 
+            // Split username and password
+            String[] credentials = decodedString.split(":", 2);
+            String username = credentials[0];
+            String password = credentials[1];
+            	
+            System.out.println(username);
+            System.out.println(password);
+        } else {
+        	System.out.println("Invalid Authorization headers");
+        }
+    }
     
 }
  
