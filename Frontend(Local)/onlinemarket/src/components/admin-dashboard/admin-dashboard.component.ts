@@ -411,7 +411,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 }
   addUserForm: any;
 
-  registrationSuccess = false;
+  password:string='';
+registrationSuccess = false;
 registrationError = false;
 errorMessage = '';
 
@@ -434,6 +435,8 @@ submitUser(): void {
   formData.append('email', this.addUser.email);
   formData.append('postalCode', this.addUser.postalCode);
   formData.append('isAdmin', this.addUser.isAdmin ? '1' : '0');
+  this.password=this.addUser.firstName+this.addUser.dob;
+  console.log(this.password);
   if (this.addUser.imageFile) {
     formData.append('imageFile', this.addUser.imageFile);
   }
@@ -447,7 +450,7 @@ submitUser(): void {
       },
       error => {
         console.error('Error adding user:', error);
-        alert('Error adding user. Please try again.');
+        //alert('Error adding user. Please try again.');
       }
     );
 }

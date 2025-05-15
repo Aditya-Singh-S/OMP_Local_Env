@@ -36,6 +36,7 @@ import com.cts.dto.ResponseDTO;
 import com.cts.dto.SignInRequest;
 import com.cts.dto.SignInResponse;
 import com.cts.entity.User;
+import com.cts.exception.PasswordsMismatchException;
 import com.cts.exception.UserNotFoundException;
 import com.cts.service.ProductService;
 import com.cts.service.SNSService;
@@ -203,15 +204,33 @@ public class UserController {
     }
  
    
+//    @PostMapping("/reset-password")
+//
+//    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+//        String result = userService.resetPassword(resetPasswordDTO);
+//        return ResponseEntity.ok(result);
+//    }
+    
     @PostMapping("/reset-password")
-
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
-        String result = userService.resetPassword(resetPasswordDTO);
-        return ResponseEntity.ok(result);
-
-   
+    public ResponseEntity<String> resetPassword(
+            @RequestParam("email") String email,
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword) {
+        try {
+            userService.resetPassword(email, newPassword, confirmPassword);
+            return ResponseEntity.ok("Password updated successfully!");      
+        } 
+        catch (UserNotFoundException e) 
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (PasswordsMismatchException e) 
+        {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) 
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during password reset.");
+        }
     }
- 
     // Generate Reset Link API
     @PostMapping("/generate-reset-link")
     public ResponseEntity<String> generateResetLink(@RequestParam String email) {
@@ -227,5 +246,7 @@ public class UserController {
     public List<ProductViewDTO> getProductSubscriptionList(@RequestParam int userId){
     	return productService.getProductSubscriptionList(userId);
     }
+    
+    
 }
  

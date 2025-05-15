@@ -8,6 +8,9 @@ public interface SNSService {
 	
 	void notifyOnAddProduct();
 
+	void notifyonresetPassword(String email);
+
+
 	void notifyAdminOnUnSubscription(String productName,String userEmail);
 	void notifyUserOnUnSubscription(String nickName,String productName,String userEmail);
 

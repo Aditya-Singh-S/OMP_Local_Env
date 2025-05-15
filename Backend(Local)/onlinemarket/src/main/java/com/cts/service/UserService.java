@@ -149,6 +149,7 @@ public class UserService {
 			throw new IOException("Could not upload image to S3: " + e.getMessage());
 		}
 	}
+   
     //Update existing user details.
     public User updateUserDetails(
             int userId,
@@ -247,21 +248,47 @@ public class UserService {
     }
     
     // Method to reset password
-    public String resetPassword(ResetPasswordDTO dto) {
-        User user = userRepository.findByEmail(dto.getEmail());
+//    public String resetPassword(ResetPasswordDTO dto) 
+//    {
+//        User user = userRepository.findByEmail(dto.getEmail());
+//        
+//        if (user == null) 
+//        {
+//            throw new UserNotFoundException("User not found!");
+//        }
+//
+//        if (!dto.getNewPassword().equals(dto.getConfirmPassword()))       
+//        {
+//            throw new PasswordsMismatchException("Password does not match!");
+//        }
+//
+//        user.setPassword(PasswordUtil.hashPassword(dto.getNewPassword()));
+//        
+//        userRepository.save(user);
+//        
+//        snsService.notifyonresetPassword(dto.getEmail());
+//        
+//        return "Password updated successfully!";
+//    }
+    
+    public void resetPassword(String email, String newPassword, String confirmPassword)
+    {
+        User user = userRepository.findByEmail(email);
+
         if (user == null) {
             throw new UserNotFoundException("User not found!");
         }
 
-        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+        if (!newPassword.equals(confirmPassword)) {
             throw new PasswordsMismatchException("Password does not match!");
         }
 
-        user.setPassword(PasswordUtil.hashPassword(dto.getNewPassword()));
+        user.setPassword(PasswordUtil.hashPassword(newPassword));
+        
         userRepository.save(user);
-
-        return "Password updated successfully!";
-    }
+        
+        snsService.notifyonresetPassword(email);
+    }   
  
     // Verify Email and Activate User
     public String verifyEmail(String email)
@@ -280,9 +307,12 @@ public class UserService {
     public String generateResetLink(String email)
     {
         User user = userRepository.findByEmail(email);
-        if (user == null) {
-            return "User not found";
+        
+        if (user == null)
+        {
+            throw new UserNotFoundException("User not found");
         }
+        
         return "http://127.0.0.1:3000/reset-page?email=" + email;
     }
 }
