@@ -58,18 +58,19 @@ export class SigninComponent implements OnInit {
     console.log("Password:", password);
 
 
-    this.authService.signIn(email, password).then(result => {
+
+    this.authService.signIn(email, password).then((result: any) => {
       console.log("User signed in:", result);
-      alert("Login successful!");
+      //alert("Login successful!");
 
       this.userEmailId = email;
       this.loginSuccess.emit(); // Emit event on successful login
       this.userService.handleLoginSuccess(this.userEmailId);
 
       this.router.navigate(['/home'])
-    }).catch(err => {
+    }).catch((err: { message: string; }) => {
       console.error('Login failed: ', err);
-      alert("Error: "+ err.message);
+      //alert("Error: "+ err.message);
     });
   }
 }

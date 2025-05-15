@@ -40,7 +40,7 @@ export class AdminUserListPopupComponent implements OnInit {
   }
 
   fetchAllUsers() {
-    this.http.get<UserDetail[]>('http:localhost:9090/OMP/admin/users').subscribe(
+    this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users').subscribe(
       (data) => {
         this.allUsers = data; 
       },
@@ -56,7 +56,7 @@ export class AdminUserListPopupComponent implements OnInit {
       const isActiveValue = this.selectedStatus === 'active';
       const params = new HttpParams().set('isActive', isActiveValue.toString());
 
-      this.http.get<UserDetail[]>('http:localhost:9090/OMP/admin/users/filter', { params }).subscribe(
+      this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users/filter', { params }).subscribe(
         (data) => {
           this.allUsers = data; 
         },
