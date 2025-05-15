@@ -23,7 +23,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReviewAndRatingService {
-
+	
+	@Autowired
+	SNSService snsService;
+	
     @Autowired
     private ReviewAndRatingRepository reviewRepository;
 
@@ -48,6 +51,9 @@ public class ReviewAndRatingService {
         newReview.setReview(review);
 //        newReview.setReviewActiveStatus(reviewActiveStatus);
         newReview.setReviewCreatedOn(Timestamp.from(Instant.now()));
+        
+     // Send notification for new review
+        snsService.notifyReviewCreated(user.getEmail(), product.getName(), rating, review);
 
         return reviewRepository.save(newReview);
     }
@@ -58,9 +64,11 @@ public class ReviewAndRatingService {
     	
     	ReviewsAndRatings existingReview = reviewRepository.findById(ratingId)
                 .orElseThrow(() -> new InvalidInputException("Rating not found with ID: " + ratingId));
-
+    	
+    	
+    	
         if (userId != null) {
-            User user =userRepository.findById(userId)
+        	User user =userRepository.findById(userId)
                     .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
             existingReview.setUser(user); // Only update if userId is provided
         }
@@ -78,6 +86,7 @@ public class ReviewAndRatingService {
         }
 
         existingReview.setReviewUpdateOn(Timestamp.from(Instant.now()));
+        snsService.notifyReviewDeleted(existingReview.getUser().getEmail(),existingReview.getProducts().getName(),rating,review);
         return reviewRepository.save(existingReview);
     }
 
@@ -113,6 +122,13 @@ public class ReviewAndRatingService {
     }
 
 	public List<ReviewAndRatingDTO> getReviewsByProductId(int productid) {
+		
+		if(productid<=0)
+		{
+			throw new InvalidProductException("Please enter valid product Id");
+		}
+		Products product = productRepository.findById(productid)
+                .orElseThrow(() -> new InvalidProductException("Product not found with ID: " + productid));
 
 		List<ReviewsAndRatings> reviews = reviewRepository.findByProductsProductidOrderByRatingDesc(productid);
 		return reviews.stream().map(ReviewAndRatingDTO::new).collect(Collectors.toList());

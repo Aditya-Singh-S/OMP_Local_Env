@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { IProductDTO, IReview } from '../model/class/interface/Products';
 
 
@@ -30,6 +30,12 @@ export class ProductService {
 
   private baseUrl = 'http://localhost:9090/OMP'; // Update with your backend URL
   http: HttpClient;
+
+  private searchResultsSource = new BehaviorSubject<any[]>([]);
+  searchResults$ = this.searchResultsSource.asObservable();
+  private invalidSearchSubject = new Subject<void>(); // New Subject for invalid searches
+  public invalidSearch$ = this.invalidSearchSubject.asObservable();
+  
 
   constructor(http: HttpClient) {
     this.http = http;
@@ -84,9 +90,13 @@ export class ProductService {
   }
 
 
-  private searchResultsSource = new BehaviorSubject<any[]>([]);
-  searchResults$ = this.searchResultsSource.asObservable();
- 
+  // private searchResultsSource = new BehaviorSubject<any[]>([]);
+  // searchResults$ = this.searchResultsSource.asObservable();
+  
+  signalInvalidSearch() {
+    this.invalidSearchSubject.next();
+  }
+
   setSearchResults(results: any[]) {
     this.searchResultsSource.next(results);
   }

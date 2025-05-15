@@ -43,7 +43,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserAdminService {
-
+	
+	@Autowired
+	SNSService snsService;
+	
 	@Autowired
 	private UserRepository userRepository;
 
@@ -80,12 +83,12 @@ public class UserAdminService {
 
 	private String uploadFileToS3(MultipartFile file) throws IOException {
 		String originalFilename = file.getOriginalFilename();
-		String key = s3KeyPrefix + originalFilename; // Use originalFilename as the key.
+		String key = s3KeyPrefix + originalFilename; 
 		PutObjectRequest putRequest = PutObjectRequest.builder().bucket(bucketName).key(key)
 				.contentType(file.getContentType()).build();
 		try {
 			s3Client.putObject(putRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-			return originalFilename; // Return the original filename.
+			return originalFilename; 
 		} catch (S3Exception e) {
 			throw new IOException("Could not upload image to S3: " + e.getMessage());
 		}
@@ -105,8 +108,10 @@ public class UserAdminService {
 			user.setPassword(null);
 		}
 		userValidationService.validateAdminAddUser(user);
-
+		snsService.userEmailVerify(user.getEmail());
 		return userRepository.save(user);
+		
+		
 	}
 
 	// No changes are required in the other methods; they can remain as is.
@@ -190,7 +195,15 @@ public class UserAdminService {
 
 		subscription.setOptIn(optInStatus);
 		subscription.setUpdatedOn(LocalDateTime.now());
+		
 		productRepository.save(subscription.getProducts());
+		
+		if(optInStatus==false) {
+			Products product = productRepository.findById(subscription.getProducts().getProductid()).orElseThrow(() -> new RuntimeException("Product not found"));
+			snsService.notifyAdminOnUnSubscription(product.getName(),user.getEmail());
+			snsService.notifyUserOnUnSubscription(user.getNickName(),product.getName(),user.getEmail());
+		}
+		
 		return subscription;
 	}
 

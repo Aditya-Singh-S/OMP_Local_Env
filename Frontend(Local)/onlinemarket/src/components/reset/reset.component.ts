@@ -310,6 +310,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RecaptchaModule } from 'ng-recaptcha-2';
 import { CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
+import { environment } from '../../environment/environment';
+
 
 @Component({
   selector: 'app-reset',
@@ -326,11 +328,8 @@ export class ResetComponent implements OnInit {
 
   poolData = {
 
-    //     UserPoolId: 'us-east-1_xfDGaQqxz',
-    // ClientId: '3htlbjbquppu1gj0j1clc39e54'
-
-    UserPoolId: 'us-east-1_JtK3G3BUj',
-    ClientId: '67tgtkhhr55r4mpbb3vr3llg9e'
+    UserPoolId: environment.UserPoolId,
+      ClientId: environment.ClientId
   };
 
   constructor(private route: ActivatedRoute, private router: Router, private fb: FormBuilder, private authService: AuthService) { }
