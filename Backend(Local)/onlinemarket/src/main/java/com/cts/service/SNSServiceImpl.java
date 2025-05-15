@@ -71,6 +71,29 @@ public class SNSServiceImpl implements SNSService {
 		snsClient.publish(publishRequest);
 		
 	}
+	
+
+	public void notifyonresetPassword(String email) {
+	    String message = "Hi User!, Your password has been reset successfully.";
+
+	    Map<String,MessageAttributeValue> attributes=Map.of
+				("recipient",MessageAttributeValue.builder()
+			  .dataType("String")
+			  .stringValue(email).build());
+	    		
+	    PublishRequest publishRequest = PublishRequest.builder()
+	            .message(message)
+	            .subject("Password Reset Successful") 
+	            .topicArn(TOPIC_ARN)
+	            .messageAttributes(attributes)
+	            .build();
+
+
+
+	    snsClient.publish(publishRequest);
+	}
+
+
 
 
 	// Scrum-80 : Email to admin and users when admin update user preferences
