@@ -162,7 +162,6 @@ input.ng-invalid.ng-touched {
   min-height: 500px;
   /* Use min-height */
   border: 2px solid #b04188;
-  overflow: auto;
 }
 
 /* Styles for the popup heading */

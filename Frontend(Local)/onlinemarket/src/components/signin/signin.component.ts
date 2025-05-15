@@ -60,7 +60,7 @@ export class SigninComponent implements OnInit {
 
     this.authService.signIn(email, password).then(result => {
       console.log("User signed in:", result);
-      alert("Login successful!");
+      //alert("Login successful!");
 
       this.userEmailId = email;
       this.loginSuccess.emit(); // Emit event on successful login
@@ -69,7 +69,7 @@ export class SigninComponent implements OnInit {
       this.router.navigate(['/home'])
     }).catch(err => {
       console.error('Login failed: ', err);
-      alert("Error: "+ err.message);
+      //alert("Error: "+ err.message);
     });
   }
 }
