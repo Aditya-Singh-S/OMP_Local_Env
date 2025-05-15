@@ -74,7 +74,7 @@ export class UserService {
 
   getUserDetails(userId: number): Observable<IUserDetails> {
     const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<IUserDetails>(`${this.baseUrl}/myDetails`, { params });
+    return this.http.get<IUserDetails>(`${this.baseUrl}/myDetails`, { headers : this.authHeaders,params });
   }
 
   getProductSubscriptionList(userId: number): Observable<IProductDTO[]> {
@@ -84,7 +84,7 @@ export class UserService {
 
   getProductRatingList(userId: number): Observable<IRatingDTO[]> {
     const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<IRatingDTO[]>(`${this.baseUrl}/reviews/user/` + userId, { params });
+    return this.http.get<IRatingDTO[]>(`${this.baseUrl}/reviews/user/` + userId, {headers:this.authHeaders, params });
   }
 
   register(formData: FormData): Observable<any> {
@@ -101,10 +101,12 @@ export class UserService {
   }
 
   updateUser(userId: any, formData: FormData): Observable<any> {
+    const tempHeaders = new HttpHeaders({
+      'Accept': 'application/json',
+      'Authorization': `this.authHeaders`
+    });
     return this.http.put(`${this.baseUrl}/updateUser/${userId}`, formData, {
-      headers: {
-        'Accept': 'application/json'
-      }
+      headers: tempHeaders
     });
   }
 
@@ -116,7 +118,7 @@ export class UserService {
       .set('review', review)
       .set('reviewActiveStatus', reviewActiveStatus.toString());
 
-    return this.http.post<any>(`${this.baseUrl}/reviews/createReview`, null, { params: params });
+    return this.http.post<any>(`${this.baseUrl}/reviews/createReview`, null, { headers : this.authHeaders,params: params });
   }
 
   addSubscription(userId: number, productId: number): Observable<any> {
@@ -220,7 +222,7 @@ export class UserService {
     if (review !== null) params = params.set('review', review);
     params = params.set('reviewActiveStatus', reviewActiveStatus.toString());
 
-    return this.http.put<any>(`${this.baseUrl}/reviews/updateReview`, {}, { params: params });
+    return this.http.put<any>(`${this.baseUrl}/reviews/updateReview`, {}, { headers:this.authHeaders,params: params });
   }
 
   deleteReview(ratingId: number): Observable<any> {
@@ -229,12 +231,12 @@ export class UserService {
 
   getUserProductReviews(userId: number): Observable<IReview[]> {
     // const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<IReview[]>(`${this.baseUrl}/reviews/all/user/` + userId); // Adjust the endpoint
+    return this.http.get<IReview[]>(`${this.baseUrl}/reviews/all/user/` + userId,{headers : this.authHeaders}); // Adjust the endpoint
   }
 
   updateUserSubscriptions(userId: number, productIds: number[]): Observable<any> {
     const url = `${this.baseUrl}/getProductSubscriptionList`; // Adjust the endpoint for updating subscriptions
-    return this.http.put(url, { productIds }); // Send the array of product IDs in the request body
+    return this.http.put(url, { productIds },{headers : this.authHeaders}); // Send the array of product IDs in the request body
   }
 
   getUserEmailById(userId: number): Observable<string | null> {
@@ -254,7 +256,7 @@ export class UserService {
             .set('email', userEmail)
             .set('isActive', isActive.toString()); // Convert boolean to string
 
-          return this.http.put(`${this.baseUrl}/admin/updateProfile`, null, { params });
+          return this.http.put(`${this.baseUrl}/admin/updateProfile`, null, {headers : this.authHeaders, params });
         } else {
           console.error('User email not found for user ID:', userId);
           return of(null); // Or return an error Observable
@@ -285,7 +287,7 @@ export class UserService {
       .set('userId', userId ? userId.toString() : '')
       .set('productId', productId.toString())
       .set('enabled', enabled.toString());
-    return this.http.put(`${this.baseUrl}/removeSubscription`, null, { params });
+    return this.http.put(`${this.baseUrl}/removeSubscription`, null, { headers : this.authHeaders,params });
   }
   
 }

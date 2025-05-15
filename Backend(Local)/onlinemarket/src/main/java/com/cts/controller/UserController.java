@@ -119,12 +119,22 @@ public class UserController {
  
     // Get User ID by Email API
     @GetMapping("/getUserIdByEmail")
-    public Integer getUserIdByEmail(@RequestParam String emailId) {
+    public Integer getUserIdByEmail(
+//    		@RequestHeader("Authorization") String authHeaders,
+    		@RequestParam String emailId) {
+    	
+//    	this.checkAuthorizationHeaders(authHeaders);
+    	
         return userService.getUserIdByEmail(emailId);
     }
     
     @GetMapping("/getUserEmailById")
-    public String getUserEmailbyId(@RequestParam int id) {
+    public String getUserEmailbyId(
+    		@RequestHeader("Authorization") String authHeaders,
+    		@RequestParam int id) {
+    	
+    	this.checkAuthorizationHeaders(authHeaders);
+    	
         return userService.getUserEmailById(id);
     }
  
@@ -151,17 +161,23 @@ public class UserController {
     
     // Get User Details by ID API
     @GetMapping("/myDetails")
-    public ResponseEntity<ResponseDTO> getUserDetailsById(@RequestParam(required = false) Integer userId) {
+    public ResponseEntity<ResponseDTO> getUserDetailsById(
+    		@RequestHeader("Authorization") String authHeaders,
+    		@RequestParam(required = false) Integer userId) {
         if (userId == null) {
             throw new UserNotFoundException("user not found");
         }
         ResponseDTO user = userService.getUserDetailsById(userId);
+        
+        this.checkAuthorizationHeaders(authHeaders);
+        
         return ResponseEntity.ok(user);
     }
  
     // Update User API
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<User> updateUserDetails(
+    		@RequestHeader("Authorization") String authHeaders,
             @PathVariable int userId,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -182,6 +198,8 @@ public class UserController {
                 addressLine1, addressLine2, postalCode, contactNumber, dateOfBirth, isActive, password
         );
  
+        this.checkAuthorizationHeaders(authHeaders);
+        
         return ResponseEntity.ok(updatedUser);
     }
 

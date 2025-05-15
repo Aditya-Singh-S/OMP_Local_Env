@@ -334,7 +334,7 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
           return this.http.put(
             'http://localhost:9090/OMP/reviews/updateReview',
             null, // No body, parameters are in the URL
-            { params }
+            { headers : this.userService.authHeaders }
           ).pipe(
             tap(response => console.log('Review updated:', response)),
             catchError(error => {

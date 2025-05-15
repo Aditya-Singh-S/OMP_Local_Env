@@ -108,19 +108,28 @@ public class ProductController {
     }
 
     @GetMapping("/product/imageByName/{name}")
-    public ResponseEntity<Resource> getImageByName(@PathVariable String name) {
+    public ResponseEntity<Resource> getImageByName(
+    		@RequestHeader("Authorization") String authHeaders,
+    		@PathVariable String name) {
         byte[] imageData = productService.getProductImageByName(name);
         if (imageData != null && imageData.length > 0) {
+        	
+        	this.checkAuthorizationHeaders(authHeaders);
+        	
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_PNG)
                     .body(new ByteArrayResource(imageData));
         } else {
+        	
+        	this.checkAuthorizationHeaders(authHeaders);
+        	
             return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("admin/updateProduct/{name}")
     public ResponseEntity<Products> updateProduct(
+    		@RequestHeader("Authorization") String authHeaders,
             @PathVariable String name,
             @RequestParam(required = false, value = "upName") String upName,
             @RequestParam(required = false, value = "description") String description,
@@ -128,6 +137,9 @@ public class ProductController {
             @RequestParam(required = false, value = "isActive") Boolean isActive)
             throws Exception {
         Products updatedProduct = productService.updateProduct(name, upName, description, file, isActive);
+        
+        this.checkAuthorizationHeaders(authHeaders);
+        
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
@@ -191,8 +203,13 @@ public class ProductController {
     }
 
     @GetMapping("/viewUsersSubscribedToProduct")
-    public ResponseEntity<List<User>> viewUsersSubscribedToProduct(@RequestParam int productId) {
+    public ResponseEntity<List<User>> viewUsersSubscribedToProduct(
+    		@RequestHeader("Authorization") String authHeaders,
+    		@RequestParam int productId) {
         List<User> subscribedUsers = productService.getUsersSubscribedToProduct(productId);
+        
+        this.checkAuthorizationHeaders(authHeaders);
+        
         return new ResponseEntity<>(subscribedUsers, subscribedUsers.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
@@ -214,16 +231,27 @@ public class ProductController {
         }
     }
 //   @PostMapping("/admin/uploadMultipleRecords")
-    public ResponseEntity<List<Products>> uploadMultipleProducts(@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
+    public ResponseEntity<List<Products>> uploadMultipleProducts(
+    		@RequestHeader("Authorization") String authHeaders,
+    		@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
         if (file.isEmpty()) {
+        	
+        	this.checkAuthorizationHeaders(authHeaders);
+        	
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
  
         try {
             List<Products> uploadedProducts = productService.addMultipleProducts(file,bulkProductisactive);
+            
+            this.checkAuthorizationHeaders(authHeaders);
+            
             return new ResponseEntity<>(uploadedProducts, HttpStatus.CREATED);
         } catch (IOException e) {
             System.err.println("Error processing Excel file: " + e.getMessage());
+            
+            this.checkAuthorizationHeaders(authHeaders);
+            
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
