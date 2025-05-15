@@ -5,8 +5,12 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { CognitoUser, CognitoUserPool, AuthenticationDetails, CognitoUserAttribute, CognitoUserSession } from 'amazon-cognito-identity-js';
 
 const poolData = {
-    UserPoolId: 'us-east-1_xfDGaQqxz',
-    ClientId: '3htlbjbquppu1gj0j1clc39e54'
+    // UserPoolId: 'us-east-1_xfDGaQqxz',
+    // ClientId: '3htlbjbquppu1gj0j1clc39e54'
+
+    UserPoolId: 'us-east-1_JtK3G3BUj',
+    ClientId: '67tgtkhhr55r4mpbb3vr3llg9e'
+
 };
 
 const userPool = new CognitoUserPool(poolData);
@@ -63,8 +67,8 @@ export class AuthService {
     }
 
 
-    private generateResetLinkUrl = 'http://127.0.0.1:3000/OMP/generate-reset-link';
-    private apiUrl = 'http://127.0.0.1:3000/OMP/reset-password';
+    private generateResetLinkUrl = 'http://localhost:9090/OMP/generate-reset-link';
+    private reset = 'http://localhost:9090/OMP/reset-password';
 
     private loggedInSource = new BehaviorSubject<boolean>(false);
     loggedIn$ = this.loggedInSource.asObservable();
@@ -78,7 +82,12 @@ export class AuthService {
         return this.http.post(this.generateResetLinkUrl, {}, { params, responseType: 'text' });
     }
 
-    resetPassword(payload: any): Observable<string> { 
-        return this.http.post(this.apiUrl, payload, { responseType: 'text' }); 
-    }
+    resetPassword(email: string, newPassword: string, confirmPassword: string): Observable<string> {
+        const params = new HttpParams()
+          .set('email', email)
+          .set('newPassword', newPassword)
+          .set('confirmPassword', confirmPassword);
+    
+        return this.http.post<string>(this.reset, null, { params, responseType: 'text' as 'json' });
+      }
 }
