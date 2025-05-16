@@ -409,6 +409,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   imageFile: null as File | null,
   isAdmin: false
 }
+  password: string = '';
   addUserForm: any;
 
   registrationSuccess = false;
@@ -434,9 +435,19 @@ submitUser(): void {
   formData.append('email', this.addUser.email);
   formData.append('postalCode', this.addUser.postalCode);
   formData.append('isAdmin', this.addUser.isAdmin ? '1' : '0');
+
+
+  this.password = this.addUser.firstName + this.addUser.dob;
+  console.log(this.password);
+
   if (this.addUser.imageFile) {
     formData.append('imageFile', this.addUser.imageFile);
   }
+
+  
+
+
+
 
   this.productService.registerUser(formData) // Send FormData
     .subscribe(
