@@ -377,7 +377,7 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
           review.reviewActiveStatus = newStatus;
         }),
         catchError(error => {
-          console.error('Error updating review status:', error);
+          console.error('Error updating review status:', error);2
           // Optionally show an error message
           return of(null);
         })
