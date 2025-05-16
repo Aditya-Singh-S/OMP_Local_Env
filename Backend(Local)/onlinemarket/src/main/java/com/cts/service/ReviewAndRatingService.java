@@ -40,23 +40,30 @@ public class ReviewAndRatingService {
     public ReviewsAndRatings createReview(int productId, int userId, double rating, String review) {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new InvalidProductException("Product not found with ID: " + productId));
-
+ 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-
+        
+ 
+     // Deactivate any existing active review
+        reviewRepository.deactivateExistingReview(userId, productId);
+ 
+        
         ReviewsAndRatings newReview = new ReviewsAndRatings();
         newReview.setProducts(product);
         newReview.setUser(user);
         newReview.setRating(rating);
         newReview.setReview(review);
-//       newReview.setReviewActiveStatus(reviewActiveStatus);
+        newReview.setReviewActiveStatus(true);
         newReview.setReviewCreatedOn(Timestamp.from(Instant.now()));
         
      // Send notification for new review
         snsService.notifyReviewCreated(user.getEmail(), product.getName(), rating, review);
-
+ 
         return reviewRepository.save(newReview);
+        
     }
+ 
 
     // Update Review
     public ReviewsAndRatings updateReview(Long ratingId, Integer userId,Double rating, String review,Boolean reviewActiveStatus) {

@@ -6,6 +6,7 @@ import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environment/environment';
 
+
 @Component({
   selector: 'app-verify-email',
   imports: [FormsModule, CommonModule],
@@ -53,6 +54,7 @@ export class VerifyEmailComponent implements OnInit {
     const cognitoUser = new CognitoUser(userData);
 
     cognitoUser.confirmRegistration(code, true, (err, result) => {
+
       if(err) {
         alert('Verification Failed: ' + err.message);
         this.errorMessage = 'Verification failed ' + err.message;
