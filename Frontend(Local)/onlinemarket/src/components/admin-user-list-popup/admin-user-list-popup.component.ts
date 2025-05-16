@@ -5,6 +5,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../../services/user.service';
 
 interface UserDetail {
   firstName: string;
@@ -26,21 +27,24 @@ interface UserDetail {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-user-list-popup.component.html',
-  styleUrl: './admin-user-list-popup.component.css'
+  styleUrl: './admin-user-list-popup.component.css',
+  providers:[UserService]
 })
 export class AdminUserListPopupComponent implements OnInit {
   allUsers: UserDetail[] = [];
   @Output() close = new EventEmitter<void>();
   selectedStatus: string = '';
 
-  constructor(private http: HttpClient) { }
+  
+
+  constructor(private http: HttpClient,private userService : UserService) { }
 
   ngOnInit(): void {
     this.fetchAllUsers();
   }
 
   fetchAllUsers() {
-    this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users').subscribe(
+    this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users',{headers : this.userService.authHeaders}).subscribe(
       (data) => {
         this.allUsers = data; 
       },
@@ -56,7 +60,7 @@ export class AdminUserListPopupComponent implements OnInit {
       const isActiveValue = this.selectedStatus === 'active';
       const params = new HttpParams().set('isActive', isActiveValue.toString());
 
-      this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users/filter', { params }).subscribe(
+      this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users/filter', { headers : this.userService.authHeaders,params }).subscribe(
         (data) => {
           this.allUsers = data; 
         },
