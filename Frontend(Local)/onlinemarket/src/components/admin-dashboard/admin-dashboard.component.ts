@@ -175,7 +175,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
             this.duplicateProductNameError = true;
           } else {
             console.error('Error adding product:', error);
-            alert('Error adding product. Please try again.');
+            alert({error});
           }
         });
     }
