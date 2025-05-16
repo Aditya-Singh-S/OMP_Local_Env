@@ -21,12 +21,14 @@ public class ProductDTO {
 	private String name;
 	private String description;
 	private String imageUrl;
+	private Boolean isActive;
 	
 	public ProductDTO(Products product) {
 		// TODO Auto-generated constructor stub
 		this.productid = product.getProductid();
 		this.name=product.getName();
 		this.description = product.getDescription();
+		this.isActive = product.getIsActive();
 		
 		//Assigning image URL for retrieving specific data
 		this.imageUrl = "OMP/product/image/" + product.getProductid();
