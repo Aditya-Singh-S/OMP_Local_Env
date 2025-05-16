@@ -13,6 +13,7 @@ interface Review {
   userName?: string; // Add userName property
   productName: string;
   reviewCreatedOn: string;
+  reviewActiveStatus:boolean;
 }
 
 @Component({
@@ -51,7 +52,7 @@ export class UserReviewComponent implements OnInit {
       )
       .subscribe(
         (data) => {
-          this.reviews = data;
+          this.reviews = data.filter(review => review.reviewActiveStatus); // Corrected property name
           this.reviews.forEach((review) => {
             this.fetchUserName(review.userId);
           });
@@ -65,6 +66,7 @@ export class UserReviewComponent implements OnInit {
         }
       );
   }
+ 
 
   fetchHighestRatedReview() {
     this.http
@@ -74,8 +76,12 @@ export class UserReviewComponent implements OnInit {
       )
       .subscribe(
         (review) => {
-          this.highestRatedReview = review;
-          this.fetchUserNameForHighestRated(review.userId);
+          if (review && review.reviewActiveStatus) { // Corrected property name
+            this.highestRatedReview = review;
+            this.fetchUserNameForHighestRated(review.userId);
+          } else {
+            this.highestRatedReview = null;
+          }
         },
         (error: HttpErrorResponse) => {
           if (error.error instanceof ErrorEvent) {
@@ -86,6 +92,7 @@ export class UserReviewComponent implements OnInit {
         }
       );
   }
+ 
 
   // fetchUserName(userId: number) {
   //   this.http
