@@ -77,7 +77,7 @@ public class ReviewAndRatingService {
         if (userId != null) {
         	User user =userRepository.findById(userId)
                     .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-            existingReview.setUser(user); // Only update if userId is provided
+            existingReview.setUser(user); 
         }
 
         if (rating != null) {
