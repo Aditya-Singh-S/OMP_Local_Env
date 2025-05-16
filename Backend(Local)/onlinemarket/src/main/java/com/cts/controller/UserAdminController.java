@@ -184,7 +184,8 @@ public class UserAdminController {
                         user.getAddressLine2(),
                         user.getPostalCode(),
                         user.isActive(),
-                        user.getUserRole().name()
+                        user.getUserRole().name(),
+                        user.isEmailVerification()
                 ))
                 .collect(Collectors.toList());
  
@@ -194,8 +195,11 @@ public class UserAdminController {
     
     //getting all user with filter
     @GetMapping("/admin/users/filter")
-    public ResponseEntity<List<UserDetailDTO>> getUsersByActiveStatus(@RequestParam("isActive") boolean isActive) {
-        List<User> users = userAdminService.getUsersByIsActive(isActive);
+    public ResponseEntity<List<UserDetailDTO>> getUsersByFilter(
+            @RequestParam(value = "isActive", required = false) Boolean isActive,
+            @RequestParam(value = "isEmailVerified", required = false) Boolean isEmailVerified) {
+
+        List<User> users = userAdminService.getUsersByFilter(isActive, isEmailVerified);
         List<UserDetailDTO> userDTOs = users.stream()
                 .map(user -> new UserDetailDTO(
                         user.getFirstName(),
@@ -209,12 +213,14 @@ public class UserAdminController {
                         user.getAddressLine2(),
                         user.getPostalCode(),
                         user.isActive(),
-                        user.getUserRole().name()
+                        user.getUserRole().name(),
+                        user.isEmailVerification() // Assuming your User entity has this field
                 ))
                 .collect(Collectors.toList());
- 
+
         return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
+
     
     
     
