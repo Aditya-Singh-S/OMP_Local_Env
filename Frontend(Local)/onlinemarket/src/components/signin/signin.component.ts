@@ -25,6 +25,12 @@ export class SigninComponent implements OnInit {
   userEmailId: string = '';
   @Output() loginSuccess = new EventEmitter<void>();
 
+   // New properties for the popup
+   showPopup: boolean = false;
+   popupTitle: string = '';
+   popupMessage: string = '';
+   verifyError:boolean=false;
+
   constructor(private fb: FormBuilder, private userService: UserService, private authService: AuthService, private cookieService: CookieServiceService, private router: Router) {}
 
   ngOnInit() {
@@ -49,7 +55,10 @@ export class SigninComponent implements OnInit {
     const { email, password } = this.signInForm.value;
 
     if (!this.signInForm.value.captchaResponse) {
-      alert("Please verify that you are not a robot.");
+      //alert("Please verify that you are not a robot.");
+      this.verifyError=true;
+      this.popupTitle="Error";
+      this.popupMessage="Please verify that you are not a robot.";
       return;
     }
 
@@ -70,7 +79,18 @@ export class SigninComponent implements OnInit {
       this.router.navigate(['/home'])
     }).catch((err: { message: string; }) => {
       console.error('Login failed: ', err);
+        this.popupTitle = 'Error';
+        this.popupMessage = 'Failed to sign in. Try again.';
+        this.showPopup = true;
       //alert("Error: "+ err.message);
     });
+  }
+
+  closePopup() {
+    this.showPopup = false;
+  }
+
+  closeVerifyPopup(){
+    this.verifyError=false;
   }
 }
