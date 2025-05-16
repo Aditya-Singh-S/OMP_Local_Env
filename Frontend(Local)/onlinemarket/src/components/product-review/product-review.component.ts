@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -38,6 +38,7 @@ export class ProductReviewComponent implements OnInit, OnDestroy {
     showReviewPopup: boolean = false;
     updateSuccessMessage: string | null = null;
     errorMessage: string | null = null;
+    @Output() reviewDeleted = new EventEmitter<number>();
 
     constructor(private userService: UserService, private router: Router) { }
 
@@ -69,8 +70,6 @@ export class ProductReviewComponent implements OnInit, OnDestroy {
                     console.log('Raw subscription data:', subscriptionData);
 
                     const reviewMap = new Map<number, ReviewViewModel>();
-
-                    // Process review data
                     reviewData.forEach(review => {
                         reviewMap.set(review.productid, {
                             isActive: review.reviewActiveStatus,
@@ -105,6 +104,8 @@ export class ProductReviewComponent implements OnInit, OnDestroy {
                                 subscribersCount: product.subscription_count
                             } as ReviewViewModel);
                         }
+                        this.reviews = this.reviews.filter(review => review.reviewActiveStatus);
+                        console.log(this.reviews)
                     });
 
                     this.reviews = Array.from(reviewMap.values());
@@ -125,7 +126,7 @@ export class ProductReviewComponent implements OnInit, OnDestroy {
         review.isActive = false;
     }
     markForDeletion(review: ReviewViewModel): void {
-        review.isActive = false; // Visually indicate it's marked for deletion
+        review.isActive = false; 
     }
 
     deleteReview(reviewToDelete: ReviewViewModel): void {
@@ -133,14 +134,15 @@ export class ProductReviewComponent implements OnInit, OnDestroy {
             this.userService.updateReview(
                 reviewToDelete.ratingId,
                 null,
-                null,
+                reviewToDelete.rating,
                 null,
                 false
             ).subscribe({
                 next: (response) => {
                     console.log('Review marked for removal successfully:', response);
                     this.updateSuccessMessage = `Review for ${reviewToDelete.productName} removed.`;
-                    this.loadUserReviews(); // Reload reviews to reflect the update
+                    this.loadUserReviews();
+                    this.reviewDeleted.emit(reviewToDelete.ratingId); 
                     setTimeout(() => this.updateSuccessMessage = null, 3000);
                 },
                 error: (error) => {

@@ -213,6 +213,7 @@ public class ProductController {
         return new ResponseEntity<>(subscribedUsers, subscribedUsers.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
+
     public void checkAuthorizationHeaders(String authHeaders) {
     	if (authHeaders != null && authHeaders.startsWith("Basic ")) {
             String base64Credentials = authHeaders.substring("Basic ".length());
@@ -235,6 +236,10 @@ public class ProductController {
     public ResponseEntity<List<Products>> uploadMultipleProducts(
     		@RequestHeader("Authorization") String authHeaders,
     		@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
+
+//	@PostMapping("/admin/uploadMultipleRecords")
+//    public ResponseEntity<List<Products>> uploadMultipleProducts(@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
+
         if (file.isEmpty()) {
         	
         	this.checkAuthorizationHeaders(authHeaders);
@@ -257,5 +262,4 @@ public class ProductController {
         }
     }
  
-
 }
