@@ -130,10 +130,10 @@ public class UserController {
     
     @GetMapping("/getUserEmailById")
     public String getUserEmailbyId(
-    		@RequestHeader("Authorization") String authHeaders,
+//    		@RequestHeader("Authorization") String authHeaders,
     		@RequestParam int id) {
     	
-    	this.checkAuthorizationHeaders(authHeaders);
+//    	this.checkAuthorizationHeaders(authHeaders);
     	
         return userService.getUserEmailById(id);
     }

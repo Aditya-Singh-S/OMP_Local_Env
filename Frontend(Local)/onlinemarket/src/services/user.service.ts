@@ -67,7 +67,7 @@ export class UserService {
 
   getUserIdByEmail(email: string): Observable<IUserIdResponse> {
     const params = new HttpParams().set('emailId', email);
-    return this.http.get<IUserIdResponse>(`${this.baseUrl}/getUserIdByEmail`, { params }).pipe(
+    return this.http.get<IUserIdResponse>(`${this.baseUrl}/getUserIdByEmail`, { params :params }).pipe(
       tap(response => this.setUserId(response)) // Set userId on successful retrieval
     );
   }
@@ -100,15 +100,32 @@ export class UserService {
     return this.http.put(`${this.baseUrl}/verify-email`, null, { params });
   }
 
+  // updateUser(userId: any, formData: FormData): Observable<any> {
+  //   const tempHeaders = new HttpHeaders({
+  //      'Accept': 'application/json',
+  //     'Authorization': `this.authHeaders`
+  //   });
+  //   return this.http.put(`${this.baseUrl}/updateUser/${userId}`, formData, {
+  //     headers: tempHeaders
+  //   });
+  // }
+
+
+  // updateUser(userId: any, formData: FormData): Observable<any> {
+  //   return this.http.put(`${this.baseUrl}/updateUser/${userId}`, formData, {
+  //     headers: {
+  //       'Accept': 'application/json'
+  //     }
+  //   });
+  // }
+
   updateUser(userId: any, formData: FormData): Observable<any> {
-    const tempHeaders = new HttpHeaders({
-      'Accept': 'application/json',
-      'Authorization': `this.authHeaders`
-    });
     return this.http.put(`${this.baseUrl}/updateUser/${userId}`, formData, {
-      headers: tempHeaders
+      headers: this.authHeaders    
     });
   }
+
+  
 
   addReview(productId: number, userId: number, rating: number, review: string, reviewActiveStatus: boolean): Observable<any> {
     const params = new HttpParams()
@@ -240,7 +257,7 @@ export class UserService {
   }
 
   getUserEmailById(userId: number): Observable<string | null> {
-    return this.http.get(`${this.baseUrl}/getUserEmailById?id=${userId}`, { responseType: 'text' }).pipe(
+    return this.http.get(`${this.baseUrl}/getUserEmailById?id=${userId}`, { responseType: 'text', headers: this.authHeaders },).pipe(
       catchError(error => {
         console.error('Error fetching user email:', error);
         return of(null);

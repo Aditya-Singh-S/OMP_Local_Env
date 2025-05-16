@@ -81,19 +81,26 @@ public class SecurityConfig {
                                         		,"OMP/searchProductByNameAndSubsCount"
                                         		,"/OMP/reviews/getSpecificProductReviews"
                                         		,"/OMP/reviews/highestRatedReview"
+                                        		
                                         		,"OMP/getUserIdByEmail"
-                                        		,"OMP/myDetails"
-                                        		,"OMP/getUserEmailById"
-                                        		,"OMP/user/image/{userId}").permitAll()
+                                        		).permitAll()
                                         
                                         
                    	                     .requestMatchers(
+                   	                    		"OMP/user/image/{userId}",
+                   	                    		"OMP/myDetails/{userId}",
                    	                    		 "OMP/addSubscription"
                    	                    		 ,"/OMP/removeSubscription"
                    	                    		 ,"OMP/updateUser/{userId}"
                                         		 ,"OMP/reviews/user/{userId}"
+//                                        		 ,"OMP/reviews/**"
+                                        		 ,"OMP/reviews/updateReview"
                    	                    		 ,"OMP/viewSubscriptionList"
-                   	                    		 ,"OMP/getProductSubscriptionList").hasAnyAuthority("USER","ADMIN")
+                   	                    		 ,"OMP/getProductSubscriptionList"
+                   	                    		,"OMP/getUserEmailById",
+                   	                    		"OMP/reviews/all/user/{userId}",
+                   	                    		"OMP/product/imageByName/{name}"
+                   	                    		).hasAnyAuthority("USER","ADMIN")
                                         
                                         
                         .anyRequest().authenticated()

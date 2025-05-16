@@ -148,7 +148,7 @@ export class ProductService {
 
   updateUserReviews(userId: number, reviews: IReview[]): Observable<any> {
     const url = `${this.baseUrl}/reviews/updateReview`; // Adjust your backend API endpoint
-    return this.http.put(url, reviews); // Send the array of updated reviews in the request body
+    return this.http.put(url,reviews,{ headers : this.authHeaders}); // Send the array of updated reviews in the request body
   }
 
   updateReviewStatus(reviewId: number, userId: number | null, isActive: boolean): Observable<any> {

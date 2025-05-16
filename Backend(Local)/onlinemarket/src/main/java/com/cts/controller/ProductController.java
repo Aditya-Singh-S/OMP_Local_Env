@@ -230,7 +230,8 @@ public class ProductController {
         	System.out.println("Invalid Authorization headers");
         }
     }
-//   @PostMapping("/admin/uploadMultipleRecords")
+    
+   @PostMapping("/admin/uploadMultipleRecords")
     public ResponseEntity<List<Products>> uploadMultipleProducts(
     		@RequestHeader("Authorization") String authHeaders,
     		@RequestParam("file") MultipartFile file, @RequestParam boolean bulkProductisactive) {
