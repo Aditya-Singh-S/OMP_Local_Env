@@ -21,7 +21,6 @@ export class AppComponent implements OnInit {
   loggedIn: boolean = false;
   userId: number | null = null;
   userDetails: IUserDetails | null = null;
-
   constructor(
     private cookieService: CookieServiceService,
     private cdr: ChangeDetectorRef,
