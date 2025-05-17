@@ -197,8 +197,9 @@ export class VerifyEmailComponent implements OnInit {
 
     cognitoUser.confirmRegistration(code, true, (err, result) => {
       if (err) {
-        alert('Verification Failed: ' + err.message);
-        this.errorMessage = 'Verification failed ' + err.message;
+        //alert('Verification Failed: ' + err.message);
+        //this.errorMessage = 'Verification failed ' + err.message;
+        this.errorMessage = 'Verification failed ';
         return;
       }
       alert('Verification successful');
@@ -222,7 +223,7 @@ export class VerifyEmailComponent implements OnInit {
       return;
     }
 
-    this.authService.resendVerificationCode(this.verifyForm.get('email')?.value) // Use form value
+    this.authService.resendVerificationCode(this.verifyForm.get('email')?.value) 
       .then(() => {
         this.infoMessage = 'Verification email has been resent successfully. After verification, Please SignIn';
         this.errorMessage = '';
