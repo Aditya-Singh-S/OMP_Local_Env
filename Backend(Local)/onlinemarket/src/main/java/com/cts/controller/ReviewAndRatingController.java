@@ -51,16 +51,18 @@ public class ReviewAndRatingController {
 			@RequestHeader("Authorization") String authHeaders,
 			@RequestParam Long ratingId,
 			@RequestParam(required=false) Integer userId,
-			@RequestParam(required = false) Double rating,
-			@RequestParam(required = false) String review,
 			@RequestParam(required = false) Boolean reviewActiveStatus
 
 	) {
 
-		ReviewsAndRatings updatedReview = reviewService.updateReview(ratingId, userId,rating, review,reviewActiveStatus);
+
+		ReviewsAndRatings updatedReview = reviewService.updateReview(ratingId, userId,reviewActiveStatus);
+
+		//ReviewsAndRatings updatedReview = reviewService.updateReview(ratingId, userId,rating, review,reviewActiveStatus);
 		
 		this.checkAuthorizationHeaders(authHeaders);
 		
+
 		return ResponseEntity.ok(updatedReview);
 
 	}
