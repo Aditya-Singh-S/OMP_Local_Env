@@ -66,7 +66,7 @@ public class ReviewAndRatingService {
  
 
     // Update Review
-    public ReviewsAndRatings updateReview(Long ratingId, Integer userId,Double rating, String review,Boolean reviewActiveStatus) {
+    public ReviewsAndRatings updateReview(Long ratingId, Integer userId,Boolean reviewActiveStatus) {
        
     	
     	ReviewsAndRatings existingReview = reviewRepository.findById(ratingId)
@@ -80,20 +80,13 @@ public class ReviewAndRatingService {
             existingReview.setUser(user); 
         }
 
-        if (rating != null) {
-            existingReview.setRating(rating);
-        }
-
-        if (review != null) {
-            existingReview.setReview(review);
-        }
 
         if (reviewActiveStatus != null) {
             existingReview.setReviewActiveStatus(reviewActiveStatus);
         }
 
         existingReview.setReviewUpdateOn(Timestamp.from(Instant.now()));
-        snsService.notifyReviewDeleted(existingReview.getUser().getEmail(),existingReview.getProducts().getName(),rating,review);
+        snsService.notifyReviewDeleted(existingReview.getUser().getEmail(),existingReview.getProducts().getName());
         return reviewRepository.save(existingReview);
     }
 
