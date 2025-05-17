@@ -44,6 +44,10 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   showSubscribersPopup: boolean = false;
   isAdmin$: Subscription | undefined; // Observable to track admin status
 
+  showAlertPopup: boolean = false;
+   popupTitle: string = '';
+   popupMessage: string = '';
+
   constructor(
     private productService: ProductService,
     private route: ActivatedRoute,
@@ -164,7 +168,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   fetchUserName(userId: number) {
-    this.userNameSubscription = this.http.get<{ firstName: string }>(`http://localhost:9090/OMP/myDetails?userId=${userId}`, { responseType: 'json' }).subscribe(
+    this.userNameSubscription = this.http.get<{ firstName: string }>(`http://localhost:9090/OMP/myDetails?userId=${userId}`, { headers:this.userService.authHeaders,responseType: 'json' }).subscribe(
       response => {
         this.userName = response?.firstName || 'Unknown User';
         console.log('Fetched username:', this.userName);
@@ -245,14 +249,20 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       ).subscribe({
         next: (response) => {
           console.log('Review added successfully:', response);
-          alert('Review Submitted successfully');
+          // alert('Review Submitted successfully');
           this.reviewDescription = "";
           this.rating = 0;
-          this.closeReviewPopup(); // Close review popup on success
-          window.location.reload();
+          this.closeReviewPopup();
+          this.popupTitle = 'Success';
+          this.popupMessage = 'Review Submitted Successfully.';
+          this.showAlertPopup = true; // Close review popup on success
         },
         error: (error) => {
           console.error('Error adding review:', error);
+          this.closeReviewPopup();
+          this.popupTitle = 'Error';
+          this.popupMessage = 'Failed to add review. Please try again.';
+          this.showAlertPopup = true;
           this.reviewError = 'Failed to add review. Please try again later.';
         }
       });
@@ -283,22 +293,31 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     subscriptionCall.pipe(take(1)).subscribe({
       next: (response) => {
         const message = this.isSubscribed ? 'Product Subscribed Successfully' : 'Product Unsubscribed Successfully';
-        alert(message);
+        // alert(message);
         this.loadUserSubscriptionsAndCheckStatus(); // Refresh the subscription list and reset initial status
         this.initialSubscriptionStatus = this.isSubscribed;
         this.isSubscribing = false;
+        this.closeSubscribePopup();
+          this.popupTitle = 'Success';
+          this.popupMessage = message;
+          this.showAlertPopup = true;
       },
       error: (error) => {
         console.error('Error updating subscription:', error);
-        alert(`Error: ${this.isSubscribed ? 'Subscribing' : 'Unsubscribing'} failed.`);
+        // alert(`Error: ${this.isSubscribed ? 'Subscribing' : 'Unsubscribing'} failed.`);
         // Revert the checkbox state on error and reset flags
         this.isSubscribed = this.initialSubscriptionStatus !== null ? this.initialSubscriptionStatus : this.isSubscribed;
         this.isSubscribing = false;
+        this.closeSubscribePopup();
+        this.popupTitle = 'Error';
+        this.popupMessage =`Product ${this.isSubscribed ? 'Subscribing' : 'Unsubscribing'} failed.` ;
+        this.showAlertPopup = true;
       }
     });
   }
 
-  toggleSubscription(): void {
-    // No need for a separate flag anymore, the comparison is done against initial state in submit
+  closeAlertPopup(){
+    window.location.reload();
+    this.showAlertPopup = false;
   }
 }

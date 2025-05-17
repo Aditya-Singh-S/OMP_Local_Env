@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -8,7 +8,12 @@ import { AdminUserListPopupComponent } from '../admin-user-list-popup/admin-user
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { NgForm } from '@angular/forms';
+
+//import { Component, ViewChild } from '@angular/core';
+
 // import { UpdateUserPopupComponent } from '../admin-update-user-popup/admin-update-user-popup.component';
+import { AdminUpdateUserPopupComponent } from '../admin-update-user-popup/admin-update-user-popup.component';
  
 interface IUserDetails {
   userID: string | number;
@@ -32,6 +37,7 @@ interface IUserDetails {
   providers: [ProductService, UserService]
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('form') form!: NgForm;
   // Single Add Product
   productName: string = '';
   productDescription: string = '';
@@ -42,9 +48,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   duplicateProductNameError: boolean = false; // For duplicate name validation
   imageRequiredError: boolean = false;
   invalidFileTypeError: boolean = false;
+  productNameError: boolean = false;
+  descriptionError: boolean = false;
+
+  productAdded:boolean=false;
+  popupMessage:string='';
+  popupTitle:string='';
 
 
- 
   // Bulk Upload
   showAddMultipleProductsPopup: boolean = false;
   bulkProductisactive: boolean = false;
@@ -54,6 +65,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
  
   // Update Product
   showUpdatePopup: boolean = false;
+  productUpdated:boolean=false;
   searchId: string = '';
   productFound = false;
   previewImage: string | ArrayBuffer | null = null;
@@ -91,9 +103,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.isAdminSubscription$ = this.userService.isAdmin$.subscribe(isAdmin => {
       this.isAdminLoggedIn = isAdmin; // Update the boolean based on the observable
       this.isLoading = false;
-      if (!this.isAdminLoggedIn) {
-        this.router.navigate(['/home']); // Redirect if not admin
-      }
+      // if (!this.isAdminLoggedIn) {
+      //   this.router.navigate(['/home']); // Redirect if not admin
+      // }
     });
   }
  
@@ -157,29 +169,65 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.imagePreview = null;
   }
  
-  submitProduct() {
-    
+ submitProduct() {
   this.imageRequiredError = !this.selectedImageFile;
-  this.invalidFileTypeError=this.invalidFileTypeError;
+  this.invalidFileTypeError = this.invalidFileTypeError;
 
-  if (this.imageRequiredError || this.duplicateProductNameError || this.productDescription.length < 100 || this.invalidFileTypeError) {
-   return; // prevent submission
+  // Reset validation flags
+  this.productNameError = false;
+  this.descriptionError = false;
+
+  if (!this.productName || !this.productName.trim()) {
+    this.productNameError = true;
   }
+
+  if (!this.productDescription || this.productDescription.length < 100) {
+    this.descriptionError = true;
     if (this.selectedImageFile && !this.duplicateProductNameError) {
       this.productService.addProduct(this.productName, this.productDescription, this.selectedImageFile, this.isActive)
         .subscribe(response => {
-          alert('Product added successfully');
+          //alert('Product added successfully');
+          this.productAdded=true;
+          this.popupTitle="Success"
+          this.popupMessage="Product added successfully!";
           this.closeAddProductPopup();
         }, error => {
           if (error && error.error && error.error.message && error.error.message.includes("Duplicate entry") && error.error.message.includes("products.name")) {
             this.duplicateProductNameError = true;
           } else {
             console.error('Error adding product:', error);
-            alert('Error adding product. Please try again.');
+            //alert('Error adding product. Please try again.');
+          this.productAdded=true;
+          this.popupTitle="Error"
+          this.popupMessage="Error adding product. Please try again.";
           }
         });
     }
   }
+
+  if (this.productNameError || this.descriptionError || this.imageRequiredError || this.invalidFileTypeError || this.duplicateProductNameError) {
+    return; // Stop submission if any error
+  }
+
+  this.productService.addProduct(this.productName, this.productDescription, this.selectedImageFile!, this.isActive)
+    .subscribe({
+      next: () => {
+        alert('Product added successfully');
+        this.closeAddProductPopup();
+      },
+      error: (error) => {
+        if (error?.error?.message?.includes("Duplicate entry") && error.error.message.includes("products.name")) {
+          this.duplicateProductNameError = true;
+        } else {
+          console.error('Error adding product:', error);
+          alert('Error adding product. Please try again.');
+        }
+      }
+    });
+}
+
+
+
  
   resetAddProductForm() {
     this.productName = '';
@@ -188,6 +236,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.selectedImageFile = null;
     this.imagePreview = null;
     this.duplicateProductNameError = false;
+  }
+
+  closeAddPopup(){
+    this.productAdded=false;
   }
  
   // Methods for Bulk Upload popup
@@ -255,6 +307,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
             this.product.upName = response[0].name;
             this.product.upDescription = response[0].description;
             this.product.isActive = response[0].isActive;
+
+
+            console.log('Raw isActive:', response[0].isActive);
+            console.log('Converted isActive:', this.product.isActive);
+
             this.productService.getProductImageByName(this.product.name)
               .subscribe(imageBlob => {
                 const reader = new FileReader();
@@ -306,10 +363,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.product.upName,
       this.product.upDescription,
       imageFile,
-      this.product.isActive ? true: false
+      this.product.isActive ? true:false
      
     ).subscribe(response => {
-      alert('Product updated successfully!');
+      //alert('Product updated successfully!');
      
       this.showUpdatePopup = false;
       this.resetUpdateProductForm();
@@ -317,14 +374,26 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.product.imageUrl = response.imageUrl;
         this.previewImage = response.imageUrl;
       }
+
+      this.productUpdated=true;
+      this.popupTitle="Success"
+      this.popupMessage="Product updated successfully!";
+      
     }, error => {
       console.error('Error updating product:', error);
+      this.productUpdated=true;
+      this.popupTitle="Error"
+      this.popupMessage="Error updating product. Please try again.";
     });
   }
  
   closeUpdateProductPopup() {
     this.showUpdatePopup = false;
     this.resetUpdateProductForm();
+  }
+
+  closeUpdatePopup(){
+    this.productUpdated=false;
   }
  
   resetUpdateProductForm() {
@@ -396,6 +465,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   //add user
 
   showAddUserPopup:boolean=false;
+  userAdded:boolean=false;
   addUser={
   firstName:'',
   lastName:'',
@@ -411,7 +481,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 }
   addUserForm: any;
 
-  registrationSuccess = false;
+password:string='';
+registrationSuccess = false;
 registrationError = false;
 errorMessage = '';
 
@@ -441,13 +512,19 @@ submitUser(): void {
   this.productService.registerUser(formData) // Send FormData
     .subscribe(
       response => {
-        alert('User added successfully!');
+        //alert('User added successfully!');
         this.resetForm();
         this.showAddUserPopup = false;
+        this.userAdded=true;
+        this.popupTitle="Success"
+        this.popupMessage="User added successfully!";
       },
       error => {
         console.error('Error adding user:', error);
-        alert('Error adding user. Please try again.');
+        //alert('Error adding user. Please try again.');
+        this.userAdded=true;
+        this.popupTitle="Error"
+        this.popupMessage="Error adding user. Please try again.";
       }
     );
 }
@@ -477,6 +554,10 @@ closeAddUserPopup(): void {
   this.showAddUserPopup = false;
   this.resetForm(); // Reset the form when closing
   // Optionally emit an event to notify the parent component that the popup was closed
+}
+
+closeUserAddedPopup(){
+  this.userAdded=false;
 }
 
 

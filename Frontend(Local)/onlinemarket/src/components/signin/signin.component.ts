@@ -10,6 +10,7 @@ import { CookieServiceService } from '../../services/cookie-service.service';
 import { UserService } from '../../services/user.service';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-signin',
@@ -29,6 +30,7 @@ export class SigninComponent implements OnInit {
    showPopup: boolean = false;
    popupTitle: string = '';
    popupMessage: string = '';
+   verifyError:boolean=false;
 
   constructor(private fb: FormBuilder, private userService: UserService, private authService: AuthService, private cookieService: CookieServiceService, private router: Router) {}
 
@@ -54,7 +56,10 @@ export class SigninComponent implements OnInit {
     const { email, password } = this.signInForm.value;
 
     if (!this.signInForm.value.captchaResponse) {
-      alert("Please verify that you are not a robot.");
+      //alert("Please verify that you are not a robot.");
+      this.verifyError=true;
+      this.popupTitle="Error";
+      this.popupMessage="Please verify that you are not a robot.";
       return;
     }
 
@@ -72,6 +77,18 @@ export class SigninComponent implements OnInit {
       this.loginSuccess.emit(); // Emit event on successful login
       this.userService.handleLoginSuccess(this.userEmailId);
 
+      const encoded = btoa(`${email}:${password}`);
+
+      localStorage.setItem('authToken',encoded);
+      console.log("Encoded = ", encoded);
+      // const token = localStorage.getItem('authToken');
+
+      // const headers = new HttpHeaders({
+      //   Authorization: `Basic ${token}`
+      // });
+
+
+
       this.router.navigate(['/home'])
     }).catch((err: { message: string; }) => {
       console.error('Login failed: ', err);
@@ -84,5 +101,9 @@ export class SigninComponent implements OnInit {
 
   closePopup() {
     this.showPopup = false;
+  }
+
+  closeVerifyPopup(){
+    this.verifyError=false;
   }
 }
