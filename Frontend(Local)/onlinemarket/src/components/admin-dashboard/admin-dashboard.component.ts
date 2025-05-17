@@ -95,6 +95,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.isAdminSubscription$ = this.userService.isAdmin$.subscribe(isAdmin => {
       this.isAdminLoggedIn = isAdmin; // Update the boolean based on the observable
       this.isLoading = false;
+
+      // if (!this.isAdminLoggedIn) {
+      //   this.router.navigate(['/home']); // Redirect if not admin
+      // }
+      
       if (!this.isAdminLoggedIn) {
         this.router.navigate(['/home']); // Redirect if not admin
       }
