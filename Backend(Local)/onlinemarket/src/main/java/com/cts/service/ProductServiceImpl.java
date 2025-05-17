@@ -437,7 +437,6 @@ public class ProductServiceImpl implements ProductService {
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 rowIndex++;
-
                 String name = getCellValue(row.getCell(0));
                 String description = getCellValue(row.getCell(1));
                 String imageUrl = null;
