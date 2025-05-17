@@ -205,7 +205,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private void uploadFileToS3(MultipartFile file, String s3Key) throws IOException {
+    protected void uploadFileToS3(MultipartFile file, String s3Key) throws IOException {
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(s3Key)
@@ -505,7 +505,7 @@ public class ProductServiceImpl implements ProductService {
         return savedProducts;
     }
 
-    private void uploadImageToS3(byte[] imageData, String key, String contentType) throws IOException {
+    protected void uploadImageToS3(byte[] imageData, String key, String contentType) throws IOException {
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
@@ -518,7 +518,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private String getFileExtension(String mimeType) {
+    protected String getFileExtension(String mimeType) {
         return switch (mimeType) {
             case "image/jpeg", "image/jpg" -> "jpg";
             case "image/png" -> "png";
