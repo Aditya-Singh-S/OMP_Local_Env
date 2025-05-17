@@ -31,7 +31,7 @@ interface IUserDetails {
  
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [FormsModule, CommonModule, HttpClientModule, AdminUserListPopupComponent, AdminUpdateUserPopupComponent],
+  imports: [FormsModule, CommonModule, HttpClientModule, AdminUserListPopupComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css'],
   providers: [ProductService, UserService]
@@ -505,8 +505,6 @@ submitUser(): void {
   formData.append('email', this.addUser.email);
   formData.append('postalCode', this.addUser.postalCode);
   formData.append('isAdmin', this.addUser.isAdmin ? '1' : '0');
-  this.password=this.addUser.firstName+this.addUser.dob;
-  console.log(this.password);
   if (this.addUser.imageFile) {
     formData.append('imageFile', this.addUser.imageFile);
   }
