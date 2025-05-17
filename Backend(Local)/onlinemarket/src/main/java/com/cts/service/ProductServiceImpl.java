@@ -9,11 +9,14 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -416,93 +419,71 @@ public class ProductServiceImpl implements ProductService {
 //    }
     
     @Override
-    public List<Products> addMultipleProducts(MultipartFile file, boolean bulkProductisactive) throws IOException {
+    public List<Products> addMultipleProducts(MultipartFile file, boolean bulkProductIsActive) throws IOException {
         List<Products> savedProducts = new ArrayList<>();
         List<String> errorMessages = new ArrayList<>();
+        Map<Integer, PictureData> imageMap = new HashMap<>(); // Store images mapped to row index
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             List<? extends PictureData> pictures = workbook.getAllPictures();
             Iterator<Row> rowIterator = sheet.iterator();
-            int pictureIndex = 0;
 
-            // Verify column headers
             if (rowIterator.hasNext()) {
-                Row headerRow = rowIterator.next();
-                if (headerRow.getCell(0) == null || !headerRow.getCell(0).getStringCellValue().trim().equalsIgnoreCase("name") ||
-                        headerRow.getCell(1) == null || !headerRow.getCell(1).getStringCellValue().trim().equalsIgnoreCase("description") ||
-                        headerRow.getCell(2) == null || !headerRow.getCell(2).getStringCellValue().trim().equalsIgnoreCase("image")) {
-                    throw new InvalidInputException("Invalid Excel format. The first row must contain column headers: 'Name', 'Description', and 'Image'.");
-                }
-            } else {
-                throw new InvalidInputException("Invalid Excel format. The Excel file is empty or missing headers.");
+                rowIterator.next(); // Skip first row (assumed headers)
             }
 
+            int rowIndex = 0;
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                String name = null;
-                String description = null;
-                byte[] imageData = null;
-                String mimeType = null;
+                rowIndex++;
+                String name = getCellValue(row.getCell(0));
+                String description = getCellValue(row.getCell(1));
+                String imageUrl = null;
 
-                try {
-                    name = row.getCell(0).getStringCellValue().trim();
-                    if (name.isEmpty()) {
-                        errorMessages.add("Product name cannot be empty at row " + row.getRowNum());
-                        continue; // Skip this product
-                    }
-                } catch (Exception e) {
-                    errorMessages.add("Error reading product name at row " + row.getRowNum() + ": " + e.getMessage());
-                    continue; // Skip this product
-                }
-
-                try {
-                    description = row.getCell(1).getStringCellValue().trim();
-                } catch (Exception e) {
-                    System.err.println("Error reading product description at row " + row.getRowNum() + ": " + e.getMessage());
-                    description = "";
-                }
-
-                if (pictureIndex < pictures.size()) {
-                    PictureData pictureData = pictures.get(pictureIndex);
-                    mimeType = pictureData.getMimeType();
-                    imageData = pictureData.getData();
-                    pictureIndex++;
-                } else {
-                    errorMessages.add("Missing image for product: " + name + " at row " + row.getRowNum());
-                    continue; // Skip this product
-                }
-
-                if (errorMessages.isEmpty()) {
-                    String imageUrl = null;
+                if (rowIndex - 1 < pictures.size()) {
+                    PictureData pictureData = pictures.get(rowIndex - 1); 
+                    String mimeType = pictureData.getMimeType();
+                    byte[] imageData = pictureData.getData();
                     String fileExtension = getFileExtension(mimeType);
                     String s3Key = s3KeyPrefix + name.replaceAll("\\s+", "_") + "." + fileExtension;
 
                     try {
                         uploadImageToS3(imageData, s3Key, mimeType);
                         imageUrl = String.format("https://%s.s3.us-east-1.amazonaws.com/%s", bucketName, s3Key);
-                        Products product = new Products();
-                        product.setName(name);
-                        product.setDescription(description);
-                        product.setImageUrl(imageUrl);
-                        product.setIsActive(bulkProductisactive);
-                        savedProducts.add(productRepository.save(product));
                     } catch (Exception e) {
                         errorMessages.add("Error uploading image for product " + name + " at row " + row.getRowNum() + ": " + e.getMessage());
                     }
                 }
+
+                Products product = new Products();
+                product.setName(name);
+                product.setDescription(description);
+                product.setImageUrl(imageUrl);
+                product.setIsActive(bulkProductIsActive);
+                savedProducts.add(productRepository.save(product));
             }
-        } catch (InvalidInputException e) {
-            errorMessages.add(e.getMessage());
         } catch (Exception e) {
             errorMessages.add("Error processing the Excel file: " + e.getMessage());
         }
 
         if (!errorMessages.isEmpty()) {
-            throw new InvalidInputException(String.join("\n", errorMessages));
+            throw new IOException(String.join("\n", errorMessages));
         }
 
         return savedProducts;
+    }
+
+    private String getCellValue(Cell cell) {
+        return (cell != null) ? cell.getStringCellValue().trim() : "";
+    }
+
+    private String getFileExtension(String mimeType) {
+        return switch (mimeType) {
+            case "image/jpeg", "image/jpg" -> "jpg";
+            case "image/png" -> "png";
+            default -> throw new IllegalArgumentException("Unexpected value: " + mimeType);
+        };
     }
 
     private void uploadImageToS3(byte[] imageData, String key, String contentType) throws IOException {
@@ -518,12 +499,5 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private String getFileExtension(String mimeType) {
-        return switch (mimeType) {
-            case "image/jpeg", "image/jpg" -> "jpg";
-            case "image/png" -> "png";
-            default -> throw new IllegalArgumentException("Unexpected value: " + mimeType);
-        };
-    }
 
 }
