@@ -31,7 +31,7 @@ export class ProductService {
   private baseUrl = 'http://localhost:9090/OMP'; // Update with your backend URL
   http: HttpClient;
 
-  private searchResultsSource = new BehaviorSubject<any[]>([]);
+  private searchResultsSource = new Subject<any[]>();
   searchResults$ = this.searchResultsSource.asObservable();
   private invalidSearchSubject = new Subject<void>(); // New Subject for invalid searches
   public invalidSearch$ = this.invalidSearchSubject.asObservable();
