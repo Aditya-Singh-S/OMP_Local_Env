@@ -166,11 +166,13 @@ export class VerifyEmailComponent implements OnInit {
     // Initialize eMail from the form control or localStorage if needed
     this.eMail = localStorage.getItem('userEmail') || '';
     this.verifyForm.patchValue({ email: this.eMail }); // Set initial value in the form
+    
 
     if (this.eMail) {
       this.displayEmail = this.eMail;
     } else {
       this.displayEmail = "please enter email";
+ 
     }
       this.infoMessage = 'Please check your email for verification';
     
@@ -232,9 +234,10 @@ export class VerifyEmailComponent implements OnInit {
   }
 
   onSubmit(): void {
-    
+    this.eMail = this.verifyForm.get('email')?.value;
     console.log(this.code);
     console.log(this.eMail);
+    console.log(this.verifyForm.get('email')?.value);
     this.verifyEmail(this.eMail, this.code);
     // if (this.verifyForm.valid) {
     //   const emailValue = this.verifyForm.get('email')?.value;
