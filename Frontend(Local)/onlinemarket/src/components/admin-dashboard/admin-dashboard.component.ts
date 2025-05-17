@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -8,11 +8,6 @@ import { AdminUserListPopupComponent } from '../admin-user-list-popup/admin-user
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { NgForm } from '@angular/forms';
-
-//import { Component, ViewChild } from '@angular/core';
-
-// import { UpdateUserPopupComponent } from '../admin-update-user-popup/admin-update-user-popup.component';
 import { AdminUpdateUserPopupComponent } from '../admin-update-user-popup/admin-update-user-popup.component';
  
 interface IUserDetails {
@@ -31,13 +26,12 @@ interface IUserDetails {
  
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [FormsModule, CommonModule, HttpClientModule, AdminUserListPopupComponent],
+  imports: [FormsModule, CommonModule, HttpClientModule, AdminUserListPopupComponent, AdminUpdateUserPopupComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css'],
   providers: [ProductService, UserService]
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
-  @ViewChild('form') form!: NgForm;
   // Single Add Product
   productName: string = '';
   productDescription: string = '';
@@ -48,14 +42,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   duplicateProductNameError: boolean = false; // For duplicate name validation
   imageRequiredError: boolean = false;
   invalidFileTypeError: boolean = false;
-  productNameError: boolean = false;
-  descriptionError: boolean = false;
-
   productAdded:boolean=false;
   popupMessage:string='';
   popupTitle:string='';
-
-
+ 
+ 
   // Bulk Upload
   showAddMultipleProductsPopup: boolean = false;
   bulkProductisactive: boolean = false;
@@ -103,9 +94,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.isAdminSubscription$ = this.userService.isAdmin$.subscribe(isAdmin => {
       this.isAdminLoggedIn = isAdmin; // Update the boolean based on the observable
       this.isLoading = false;
-      // if (!this.isAdminLoggedIn) {
-      //   this.router.navigate(['/home']); // Redirect if not admin
-      // }
+      if (!this.isAdminLoggedIn) {
+        this.router.navigate(['/home']); // Redirect if not admin
+      }
     });
   }
  
@@ -169,20 +160,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.imagePreview = null;
   }
  
- submitProduct() {
+  submitProduct() {
+   
   this.imageRequiredError = !this.selectedImageFile;
-  this.invalidFileTypeError = this.invalidFileTypeError;
-
-  // Reset validation flags
-  this.productNameError = false;
-  this.descriptionError = false;
-
-  if (!this.productName || !this.productName.trim()) {
-    this.productNameError = true;
+  this.invalidFileTypeError=this.invalidFileTypeError;
+ 
+  if (this.imageRequiredError || this.duplicateProductNameError || this.productDescription.length < 100 || this.invalidFileTypeError) {
+   return; // prevent submission
   }
-
-  if (!this.productDescription || this.productDescription.length < 100) {
-    this.descriptionError = true;
     if (this.selectedImageFile && !this.duplicateProductNameError) {
       this.productService.addProduct(this.productName, this.productDescription, this.selectedImageFile, this.isActive)
         .subscribe(response => {
@@ -204,30 +189,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         });
     }
   }
-
-  if (this.productNameError || this.descriptionError || this.imageRequiredError || this.invalidFileTypeError || this.duplicateProductNameError) {
-    return; // Stop submission if any error
-  }
-
-  this.productService.addProduct(this.productName, this.productDescription, this.selectedImageFile!, this.isActive)
-    .subscribe({
-      next: () => {
-        alert('Product added successfully');
-        this.closeAddProductPopup();
-      },
-      error: (error) => {
-        if (error?.error?.message?.includes("Duplicate entry") && error.error.message.includes("products.name")) {
-          this.duplicateProductNameError = true;
-        } else {
-          console.error('Error adding product:', error);
-          alert('Error adding product. Please try again.');
-        }
-      }
-    });
-}
-
-
-
  
   resetAddProductForm() {
     this.productName = '';
@@ -237,7 +198,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.imagePreview = null;
     this.duplicateProductNameError = false;
   }
-
+ 
   closeAddPopup(){
     this.productAdded=false;
   }
@@ -289,7 +250,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         });
     }
   }
-  
+ 
  
   openUpdateProductPopup() {
     this.showUpdatePopup = true;
@@ -297,7 +258,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.productFound = false;
     this.previewImage = null;
   }
-
+ 
   searchProduct() {
     if (this.product.name && this.product.name.trim() !== '') {
       this.productService.searchProduct(this.product.name.trim())
@@ -307,11 +268,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
             this.product.upName = response[0].name;
             this.product.upDescription = response[0].description;
             this.product.isActive = response[0].isActive;
-
-
-            console.log('Raw isActive:', response[0].isActive);
-            console.log('Converted isActive:', this.product.isActive);
-
             this.productService.getProductImageByName(this.product.name)
               .subscribe(imageBlob => {
                 const reader = new FileReader();
@@ -363,7 +319,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.product.upName,
       this.product.upDescription,
       imageFile,
-      this.product.isActive ? true:false
+      this.product.isActive ? true: false
      
     ).subscribe(response => {
       //alert('Product updated successfully!');
@@ -374,11 +330,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.product.imageUrl = response.imageUrl;
         this.previewImage = response.imageUrl;
       }
-
+ 
       this.productUpdated=true;
       this.popupTitle="Success"
       this.popupMessage="Product updated successfully!";
-      
+ 
     }, error => {
       console.error('Error updating product:', error);
       this.productUpdated=true;
@@ -391,7 +347,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.showUpdatePopup = false;
     this.resetUpdateProductForm();
   }
-
+ 
   closeUpdatePopup(){
     this.productUpdated=false;
   }
@@ -461,9 +417,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       alert('Error: Could not update user (ID missing).');
     }
   }
-
+ 
   //add user
-
+ 
   showAddUserPopup:boolean=false;
   userAdded:boolean=false;
   addUser={
@@ -480,18 +436,18 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   isAdmin: false
 }
   addUserForm: any;
-
-password:string='';
+ 
+  password:string='';
 registrationSuccess = false;
 registrationError = false;
 errorMessage = '';
-
-
+ 
+ 
 openAddUserPopup() {
   console.log('openAddUserPopup');
   this.showAddUserPopup = true;
 }
-
+ 
 submitUser(): void {
   console.log("inside submit user");
   const formData = new FormData();
@@ -505,10 +461,12 @@ submitUser(): void {
   formData.append('email', this.addUser.email);
   formData.append('postalCode', this.addUser.postalCode);
   formData.append('isAdmin', this.addUser.isAdmin ? '1' : '0');
+  this.password=this.addUser.firstName+this.addUser.dob;
+  console.log(this.password);
   if (this.addUser.imageFile) {
     formData.append('imageFile', this.addUser.imageFile);
   }
-
+ 
   this.productService.registerUser(formData) // Send FormData
     .subscribe(
       response => {
@@ -528,7 +486,7 @@ submitUser(): void {
       }
     );
 }
-
+ 
 removeSelectedFile(): void {
   this.addUser.imageFile = null;
   // Optionally reset the file input to allow selecting the same file again
@@ -536,12 +494,12 @@ removeSelectedFile(): void {
     this.addUser.imageFile=null;
   }
 }
-
+ 
 onFileChange(event: any): void {
   // if (event.target.files && event.target.files.length > 0) {
   //   this.addUser.uploadPhoto = event.target.files[0];
   // }
-
+ 
   const file = event.target.files[0];
   if (file) {
     this.addUser.imageFile = file;
@@ -555,24 +513,24 @@ closeAddUserPopup(): void {
   this.resetForm(); // Reset the form when closing
   // Optionally emit an event to notify the parent component that the popup was closed
 }
-
+ 
+ 
 closeUserAddedPopup(){
   this.userAdded=false;
 }
-
-
+ 
 removePhoto() {
-
+ 
   const photoInput = document.getElementById('imageFile') as HTMLInputElement;
-
+ 
   if (photoInput) {
-
+ 
       photoInput.value = '';
-
+ 
   }
-
+ 
 }
-
+ 
 resetForm(): void {
   this.addUser = {
     firstName: '',
@@ -589,6 +547,7 @@ resetForm(): void {
   }
  
 }
-
+ 
 }
-
+ 
+ 
