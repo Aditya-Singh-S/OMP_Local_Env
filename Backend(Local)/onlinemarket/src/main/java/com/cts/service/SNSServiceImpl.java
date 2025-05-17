@@ -251,7 +251,7 @@ public class SNSServiceImpl implements SNSService {
 
 
 	@Override
-	public void notifyReviewDeleted(String userEmail, String productName) {
+	public void notifyReviewDeleted(String userEmail, String productName, double rating, String review) {
 		
 		Map<String, MessageAttributeValue> attributes = Map.of(
 	            "recipient", MessageAttributeValue.builder()
@@ -265,9 +265,11 @@ public class SNSServiceImpl implements SNSService {
                 Your review for the product: %s has been successfully deleted.
 
                 Deleted review details:
+                Rating: %.1f stars
+                Review: %s
 
                 If you did not initiate this deletion, please contact our support team.
-                """, userEmail, productName);
+                """, userEmail, productName, rating, review);
 
         PublishRequest publishRequest = PublishRequest.builder()
                 .topicArn(TOPIC_ARN)

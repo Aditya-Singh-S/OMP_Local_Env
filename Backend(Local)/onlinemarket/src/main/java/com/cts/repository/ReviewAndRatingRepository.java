@@ -21,7 +21,7 @@ public interface ReviewAndRatingRepository extends JpaRepository<ReviewsAndRatin
 	@Transactional
 	@Query(value = "UPDATE reviewsandratings " +
 	               "SET isactive = false, updatedon = CURRENT_TIMESTAMP " +
-	               "WHERE isactive = true",
+	               "WHERE isactive = true AND userid=:userId AND productid=:productId",
 	       nativeQuery = true)
 	void deactivateExistingReview(@Param("userId") int userId,
 	                              @Param("productId") int productId);
