@@ -120,6 +120,7 @@ export class UserReviewComponent implements OnInit {
     this.http
       .get<{ firstName: string }>(`http://localhost:9090/OMP/myDetails?userId=${userId}`, {
         responseType: 'json',
+        headers:this.userService.authHeaders
       })
       .subscribe(
         (response) => {
@@ -144,6 +145,8 @@ export class UserReviewComponent implements OnInit {
     this.http
       .get<{ firstName: string }>(`${this.baseUrl}/myDetails?userId=${userId}`, {
         responseType: 'json',
+        headers:this.userService.authHeaders
+
       })
       .subscribe(
         (response) => {
