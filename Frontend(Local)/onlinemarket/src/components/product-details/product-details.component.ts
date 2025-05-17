@@ -168,7 +168,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   fetchUserName(userId: number) {
-    this.userNameSubscription = this.http.get<{ firstName: string }>(`http://localhost:9090/OMP/myDetails?userId=${userId}`, { responseType: 'json' }).subscribe(
+    this.userNameSubscription = this.http.get<{ firstName: string }>(`http://localhost:9090/OMP/myDetails?userId=${userId}`, { headers:this.userService.authHeaders,responseType: 'json' }).subscribe(
       response => {
         this.userName = response?.firstName || 'Unknown User';
         console.log('Fetched username:', this.userName);
@@ -314,10 +314,6 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
         this.showAlertPopup = true;
       }
     });
-  }
-
-  toggleSubscription(): void {
-    // No need for a separate flag anymore, the comparison is done against initial state in submit
   }
 
   closeAlertPopup(){

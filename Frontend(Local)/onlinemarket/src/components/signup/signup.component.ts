@@ -12,7 +12,7 @@ import { UserService } from '../../services/user.service';
 
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
- 
+
 @Component({
 
   selector: 'app-signup',
@@ -30,19 +30,16 @@ import { AuthService } from '../../services/auth.service';
 export class SignupComponent {
 
   signUpForm: FormGroup;
-
   photoError: string = '';
-
   emailError: string = '';
-
+  isFileSelected: boolean = false;
   potentiallyDuplicateEmails: string[] = [];
-
   destroy$ = new Subject<void>();
   showPopup: boolean = false;
   popupTitle: string = '';
   popupMessage: string = '';
   popupType: 'success' | 'error' = 'success';
- 
+
   constructor(private fb: FormBuilder, private userService: UserService, private authService: AuthService, private router: Router) {
 
     this.signUpForm = this.fb.group({
@@ -57,9 +54,9 @@ export class SignupComponent {
 
       contactNo: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
 
-      password: ['',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/)]],
+      password: ['',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)]],
 
-      confirmPassword: ['', [Validators.required]],
+      confirmPassword: ['', [Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)]],
 
       addressLine1: ['', [Validators.required, Validators.minLength(10)]],
 
@@ -72,33 +69,34 @@ export class SignupComponent {
     },
 
     { validator: this.passwordMatchValidator });
- 
-    this.signUpForm.get('email')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(email => {
 
-      if (this.potentiallyDuplicateEmails.includes(email)) {
 
-        this.signUpForm.get('email')?.setErrors({ 'potentialDuplicate': true });
+    // this.signUpForm.get('email')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(email => {
 
-      } else if (this.signUpForm.get('email')?.errors?.['potentialDuplicate']) {
+    //   if (this.potentiallyDuplicateEmails.includes(email)) {
 
-        const currentErrors = { ...this.signUpForm.get('email')?.errors };
+    //     this.signUpForm.get('email')?.setErrors({ 'potentialDuplicate': true });
 
-        delete currentErrors['potentialDuplicate'];
+    //   } else if (this.signUpForm.get('email')?.errors?.['potentialDuplicate']) {
 
-        this.signUpForm.get('email')?.setErrors(Object.keys(currentErrors).length > 0 ? currentErrors : null);
+    //     const currentErrors = { ...this.signUpForm.get('email')?.errors };
 
-      }
+    //     delete currentErrors['potentialDuplicate'];
 
-    });
+    //     this.signUpForm.get('email')?.setErrors(Object.keys(currentErrors).length > 0 ? currentErrors : null);
+
+    //   }
+
+    // });
 
   }
- 
+
   passwordMatchValidator(formGroup: FormGroup): void {
 
     const password = formGroup.get('password')?.value;
 
     const confirmPassword = formGroup.get('confirmPassword')?.value;
- 
+
     if (password && confirmPassword && password !== confirmPassword) {
 
       formGroup.get('confirmPassword')?.setErrors({ mismatch: true });
@@ -110,7 +108,7 @@ export class SignupComponent {
     }
 
   }
- 
+
   minimumAgeValidator(minAge: number) {
 
     return (control: any) => {
@@ -130,8 +128,8 @@ export class SignupComponent {
     };
 
   }
- 
- 
+
+
   // onFileChange(event: any) {
 
   //   const file = event.target.files[0];
@@ -151,7 +149,22 @@ export class SignupComponent {
   //   }
 
   // }
- 
+
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.isFileSelected = true; 
+      if (file.size < 10240 || file.size > 20480) {
+        this.photoError = 'Photo must be between 10KB and 20KB.';
+      } else {
+        this.photoError = '';
+      }
+    } else {
+      this.isFileSelected = false; 
+    }
+  }
+
+
   removePhoto() {
 
     const photoInput = document.getElementById('photo') as HTMLInputElement;
@@ -165,10 +178,10 @@ export class SignupComponent {
     }
 
 }
- 
+
 onSubmit(): void {
   this.signUpForm.markAllAsTouched();
- 
+
   let isPhotoValid = true;
   const photoInput = (document.getElementById('photo') as HTMLInputElement);
   if (!photoInput?.files?.length) {
@@ -180,11 +193,11 @@ onSubmit(): void {
   } else {
     this.photoError = '';
   }
- 
+
   if (this.signUpForm.invalid || !isPhotoValid) {
     return;
   }
- 
+
   const formData = new FormData();
   formData.append('firstName', this.signUpForm.get('firstName')?.value || '');
   formData.append('lastName', this.signUpForm.get('lastName')?.value || '');
@@ -196,13 +209,13 @@ onSubmit(): void {
   formData.append('postalCode', this.signUpForm.get('postalCode')?.value || '');
   formData.append('contactNumber', this.signUpForm.get('contactNo')?.value || '');
   formData.append('dateOfBirth', this.signUpForm.get('dob')?.value || '');
- 
+
   if (photoInput?.files?.length) {
     formData.append('imageFile', photoInput.files[0]);
   }
- 
+
   console.log(Array.from(formData.entries()));
- 
+
   const email = this.signUpForm.get('email')?.value;
   const password = this.signUpForm.get('password')?.value;
   localStorage.setItem('userEmail', email);
@@ -222,10 +235,11 @@ onSubmit(): void {
     alert('Error:'+ err.message);
   });
 }
- 
+
 closePopup() {
   this.showPopup = false;
 }
- 
+
 }
+
  

@@ -2,6 +2,7 @@ import { Injectable, OnInit, OnDestroy } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { interval, Subscription, Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class CookieServiceService implements OnInit, OnDestroy {
 
   constructor(
     private cookieService: CookieService,
-    private router: Router
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -49,6 +50,7 @@ export class CookieServiceService implements OnInit, OnDestroy {
 
   clearLogoutData(): void {
     localStorage.removeItem(this.userDataKey);
+    localStorage.removeItem('authToken');
     console.log('User data cleared from local storage.');
     this.logoutSubject.next();
   }
