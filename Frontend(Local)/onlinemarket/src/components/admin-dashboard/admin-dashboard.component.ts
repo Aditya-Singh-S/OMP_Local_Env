@@ -9,6 +9,7 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AdminUpdateUserPopupComponent } from '../admin-update-user-popup/admin-update-user-popup.component';
+import { AuthService } from '../../services/auth.service';
  
 interface IUserDetails {
   userID: string | number;
@@ -87,7 +88,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // update user popup code
   isUpdateUserPopupVisible: boolean = false;
  
-  constructor(private productService: ProductService, private userService: UserService, private router: Router) { }
+  constructor(private productService: ProductService, private userService: UserService, private authService: AuthService, private router: Router) { }
  
   ngOnInit(): void {
     console.log (this.product.isActive);
@@ -435,6 +436,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   imageFile: null as File | null,
   isAdmin: false
 }
+  
   addUserForm: any;
  
   password:string='';
@@ -466,25 +468,58 @@ submitUser(): void {
   if (this.addUser.imageFile) {
     formData.append('imageFile', this.addUser.imageFile);
   }
+
+  this.authService.signUp(this.addUser.email, this.password).then(result => {
+    console.log('User registered through admin:', result);
+    alert("Registration Successful! Check for email verification");
+
+    this.productService.registerUser(formData)
  
   this.productService.registerUser(formData) // Send FormData
     .subscribe(
       response => {
-        //alert('User added successfully!');
-        this.resetForm();
-        this.showAddUserPopup = false;
-        this.userAdded=true;
-        this.popupTitle="Success"
-        this.popupMessage="User added successfully!";
-      },
-      error => {
-        console.error('Error adding user:', error);
-        //alert('Error adding user. Please try again.');
-        this.userAdded=true;
-        this.popupTitle="Error"
-        this.popupMessage="Error adding user. Please try again.";
-      }
+              //alert('User added successfully!');
+              this.resetForm();
+              this.showAddUserPopup = false;
+              this.userAdded=true;
+              this.popupTitle="Success"
+              this.popupMessage="User added successfully!";
+            },
+            error => {
+              console.error('Error adding user:', error);
+              //alert('Error adding user. Please try again.');
+              this.userAdded=true;
+              this.popupTitle="Error"
+              this.popupMessage="Error adding user. Please try again.";
+            }
     );
+
+    this.router.navigate(['/verify-email']);
+
+  }).catch(err => {
+    console.error("Registration failed:",err);
+    alert('Error:'+ err.message);
+  })
+  
+
+  // this.productService.registerUser(formData) // Send FormData
+  //   .subscribe(
+  //     response => {
+  //       //alert('User added successfully!');
+  //       this.resetForm();
+  //       this.showAddUserPopup = false;
+  //       this.userAdded=true;
+  //       this.popupTitle="Success"
+  //       this.popupMessage="User added successfully!";
+  //     },
+  //     error => {
+  //       console.error('Error adding user:', error);
+  //       //alert('Error adding user. Please try again.');
+  //       this.userAdded=true;
+  //       this.popupTitle="Error"
+  //       this.popupMessage="Error adding user. Please try again.";
+  //     }
+  //   );
 }
  
 removeSelectedFile(): void {
