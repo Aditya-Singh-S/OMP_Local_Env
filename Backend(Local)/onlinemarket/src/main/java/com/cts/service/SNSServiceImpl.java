@@ -17,6 +17,8 @@ import software.amazon.awssdk.services.sns.model.SubscribeRequest;
 
 @Service
 public class SNSServiceImpl implements SNSService {
+	@Autowired
+	UserRepository userRepo;
 	
 	@Autowired
 	SnsClient snsClient;
@@ -100,22 +102,30 @@ public class SNSServiceImpl implements SNSService {
 	// and this method sends email to the admin
 	@Override
 	public void notifyAdminOnUnSubscription(String productName,String userEmail) {
-		Map<String, MessageAttributeValue> attributes = Map.of(
-	            "recipient", MessageAttributeValue.builder()
-	                .dataType("String")
-	                .stringValue("ADMIN").build());
-	
+		
 		String subject = "Product Subscription Removed!";
 		String message = "Hey Admin, you have removed Subscription of the product " + productName + " for " + userEmail;
- 
-        PublishRequest publishRequest = PublishRequest.builder()
-        		.messageAttributes(attributes)
-        		.topicArn(TOPIC_ARN)
-                .subject(subject)
-                .message(message)
-                .build();
- 
-        snsClient.publish(publishRequest);
+		
+		List<String> adminEmails = userRepo.getAdminList();
+		
+		for(String email: adminEmails) {
+			
+			Map<String, MessageAttributeValue> attributes = Map.of(
+		            "recipient", MessageAttributeValue.builder()
+		                .dataType("String")
+		                .stringValue(email).build());
+			
+			PublishRequest publishRequest = PublishRequest.builder()
+	        		.messageAttributes(attributes)
+	        		.topicArn(TOPIC_ARN)
+	                .subject(subject)
+	                .message(message)
+	                .build();
+	 
+	        snsClient.publish(publishRequest);
+		}
+		
+        
 	}
 	
 	// Scrum-80 : Email to admin and users when admin update user preferences
@@ -198,19 +208,28 @@ public class SNSServiceImpl implements SNSService {
 	@Override
 	public void notifyAdminOnUpdateProduct() {
 		
+		List<String> adminEmails = userRepo.getAdminList();
+		
 		String message = "Attention ADMIN Group!! Someone just updated the product!!";
 		
-		Map<String, MessageAttributeValue> attribute = Map.of(
-	            "recipient", MessageAttributeValue.builder()
-	                .dataType("String")
-	                .stringValue("ADMIN").build());
+		for(String email: adminEmails) {
+			
+			
+			
+			Map<String, MessageAttributeValue> attribute = Map.of(
+		            "recipient", MessageAttributeValue.builder()
+		                .dataType("String")
+		                .stringValue(email).build());
+			
+			PublishRequest request = PublishRequest.builder().message(message)
+					.topicArn(TOPIC_ARN)
+					.messageAttributes(attribute)
+					.build();
+			
+			snsClient.publish(request);
+			//System.out.println(email);
+		}
 		
-		PublishRequest request = PublishRequest.builder().message(message)
-				.topicArn(TOPIC_ARN)
-				.messageAttributes(attribute)
-				.build();
-		
-		snsClient.publish(request);
 		
 	}
 
@@ -279,7 +298,9 @@ public class SNSServiceImpl implements SNSService {
         snsClient.publish(publishRequest);
     }
 
-
+	
+	
+	
 	@Override
 	public void notifyOnSubscribing(String email, String nickName, String productName) {
 		// TODO Auto-generated method stub
@@ -332,6 +353,32 @@ public class SNSServiceImpl implements SNSService {
 				.messageAttributes(attributes)
 				.build();
 	}
+
+
+	@Override
+	public void notifyAdminOnUserAddedByAdmin() {
+		String subject = "User Added!";
+		String message = "User added by admin!";
 		
+		List<String> adminEmails = userRepo.getAdminList();
+		
+		for(String email: adminEmails) {
+			
+			Map<String, MessageAttributeValue> attributes = Map.of(
+		            "recipient", MessageAttributeValue.builder()
+		                .dataType("String")
+		                .stringValue(email).build());
+			
+			PublishRequest publishRequest = PublishRequest.builder()
+	        		.messageAttributes(attributes)
+	        		.topicArn(TOPIC_ARN)
+	                .subject(subject)
+	                .message(message)
+	                .build();
+	 
+	        snsClient.publish(publishRequest);
+		
+		}
 	}
+}
 
