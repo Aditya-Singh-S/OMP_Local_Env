@@ -107,17 +107,12 @@
       <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control" />
       <div *ngIf="signUpForm.get('confirmPassword')?.errors && signUpForm.get('confirmPassword')?.touched" class="text-danger">
       <div *ngIf="signUpForm.get('confirmPassword')?.errors?.['required']">* Confirmation password is required.</div>
-      <div *ngIf="signUpForm.get('confirmPassword')?.errors?.['pattern']" class="text-danger">
-                * Passwords do not match.
-      </div>        
+      <div *ngIf="signUpForm.get('confirmPassword')?.errors?.['mismatch']" class="text-danger">
+            * Passwords do not match.
+          </div>       
       </div>
           
-
-
           <button type="submit" class="btn btn-primary">Submit</button>
-          
-
-
 
       </div>
       </div>

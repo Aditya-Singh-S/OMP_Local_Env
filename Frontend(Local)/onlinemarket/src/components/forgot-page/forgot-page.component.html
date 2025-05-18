@@ -35,12 +35,15 @@
               <div *ngIf="forgotForm.get('email')?.errors?.['required']">Email is required.</div>
               <div *ngIf="forgotForm.get('email')?.errors?.['email']">Enter a valid email.</div>
             </div>
+            <div *ngIf="emailError" class="error">{{ emailError }}</div>
           </div>
         </div>
+        <div *ngIf="message" class="message">{{ message }}</div>
         <re-captcha (resolved)="onCaptchaResolved($event)"
                     siteKey="6Lf_uRMrAAAAAMXgbKvXDk9Mmwza9GaZY3bvoRFG"></re-captcha>
+        <div *ngIf="recaptchaError" class="error">{{ recaptchaError }}</div>
         <div class="column">
-          <button type="submit" class="submit" [disabled]="forgotForm.invalid">Submit</button>
+          <button type="submit" class="submit" >Submit</button>
         </div>
       </form>
     </div>

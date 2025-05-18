@@ -180,10 +180,10 @@
 
 
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { RecaptchaModule } from 'ng-recaptcha-2';
+import { RecaptchaModule, RecaptchaComponent } from 'ng-recaptcha-2';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
@@ -201,14 +201,18 @@ export class ForgotPageComponent implements OnInit {
   forgotForm!: FormGroup;
   captchaResponse: string | null = null;
   message: string = '';
+  emailError: string = '';
+  recaptchaError: string = ''; 
 
 
-    email: string = '';
+  email: string = '';
   
-    userPool = new CognitoUserPool({
-      UserPoolId: environment.UserPoolId,
+  userPool = new CognitoUserPool({
+    UserPoolId: environment.UserPoolId,
     ClientId: environment.ClientId
-    });
+  });
+
+  @ViewChild(RecaptchaComponent) recaptchaComponent!: RecaptchaComponent; 
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) { }
 
@@ -217,19 +221,40 @@ export class ForgotPageComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       captchaResponse: ['', Validators.required] 
     });
+
+    // Clear email error when email input changes or form becomes invalid
+    this.forgotForm.get('email')?.valueChanges.subscribe(() => {
+      this.emailError = '';
+      if (this.forgotForm.invalid) {
+        this.message = ''; // Clear general message
+      }
+    });
   }
 
   onCaptchaResolved(captchaResponse: string | null) {
     this.forgotForm.patchValue({ captchaResponse });
     console.log('Captcha Response:', captchaResponse);
+    this.recaptchaError = '';
   }
 
   onSubmit() {
+    this.recaptchaError = '';
+    this.emailError = '';
+
+    if (!this.forgotForm.get('captchaResponse')?.value) {
+      this.recaptchaError = 'Please verify that you are not a robot.';
+      console.log('Recaptcha is not clicked');
+    } else {
+      this.recaptchaError = ''; // Clear Recaptcha error
+    }
+
     if (this.forgotForm.invalid) {
-      alert("Please fill in all required fields and verify the captcha.");
+      //alert("Please fill in all required fields and verify the captcha.");
       return;
     }
 
+    // const email = this.forgotForm.value.email;
+    // console.log("Requesting reset link for:", email);
 
     const userData = {
           Username: this.email,
@@ -242,20 +267,24 @@ export class ForgotPageComponent implements OnInit {
         this.authService.forgotPassword(this.email).subscribe({
        next: (response) => {
         console.log("successful");
-
+        this.message = "Reset link has been generated in the console.";
+        this.emailError = '';
+        this.recaptchaError = '';
+        this.forgotForm.reset(); 
+        this.resetRecaptcha(); 
         
         cognitoUser.forgotPassword({
           onSuccess: function(data: any) {
             console.log("Code sent successfully", data);
-            alert("Code has been sent.");
-    
+            //alert("Code has been sent.");
+            
           },
           onFailure: function(err: any) {
             console.error("Error sending code", err);
           }
         })
 
-        this.router.navigate(['/verify-email']);
+        this.router.navigate(['/verify-reset-page']);
          localStorage.setItem('forgotEmail', this.email);
          this.forgotForm.get('captchaResponse')?.setValue(null); 
 
@@ -264,14 +293,21 @@ export class ForgotPageComponent implements OnInit {
         console.error("Error initiating password reset:", error);
 
         if (error.status === 404) {
-          alert("User not found. Please check your email address.");
-          window.location.reload();
+          // alert("User not found");
+          this.emailError = "User not found";
+          this.message = '';
         } else {
-          alert("Something went wrong. Please try again later.");
-
+          // alert("Something went wrong");
+          this.message = "Something went wrong"; // A general error message.
+          this.emailError = '';
         }
+        this.recaptchaError = '';
+        this.message = "";
         this.forgotForm.get('captchaResponse')?.setValue(null); 
-      }})
+        this.resetRecaptcha();
+        //this.forgotForm.get('captchaResponse')?.setValue(null); 
+        
+      }});
 
     // cognitoUser.forgotPassword({
     //   onSuccess: function(data: any) {
@@ -298,5 +334,10 @@ export class ForgotPageComponent implements OnInit {
       //   this.forgotForm.get('captchaResponse')?.setValue(null); 
       // }
     
+  }
+  private resetRecaptcha() {
+    if (this.recaptchaComponent) {
+      this.recaptchaComponent.reset(); // Use the reset() method
+    }
   }
 }
