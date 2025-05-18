@@ -29,7 +29,8 @@ interface UserDetail {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-user-list-popup.component.html',
-  styleUrl: './admin-user-list-popup.component.css'
+  styleUrl: './admin-user-list-popup.component.css',
+  providers:[UserService]
 })
 export class AdminUserListPopupComponent implements OnInit {
   allUsers: UserDetail[] = [];
@@ -44,7 +45,7 @@ export class AdminUserListPopupComponent implements OnInit {
   }
 
   fetchAllUsers() {
-    this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users').subscribe(
+    this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users',{headers : this.userService.authHeaders}).subscribe(
       (data) => {
         console.log('Raw user data:', data);
         this.allUsers = data; 
@@ -61,7 +62,7 @@ export class AdminUserListPopupComponent implements OnInit {
       const isActiveValue = this.selectedStatus === 'active';
       const params = new HttpParams().set('isActive', isActiveValue.toString());
 
-      this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users/filter', { params }).subscribe(
+      this.http.get<UserDetail[]>('http://localhost:9090/OMP/admin/users/filter', { headers : this.userService.authHeaders,params }).subscribe(
         (data) => {
           this.allUsers = data; 
         },
