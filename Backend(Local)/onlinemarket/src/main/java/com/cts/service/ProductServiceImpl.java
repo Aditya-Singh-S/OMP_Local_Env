@@ -58,7 +58,8 @@ public class ProductServiceImpl implements ProductService {
 	
 	@Autowired
 	SNSService snsService;
-	
+	@Autowired
+	UserRepository userRepo;
     @Autowired
     ProductRepository productRepository;
     @Autowired
@@ -200,6 +201,8 @@ public class ProductServiceImpl implements ProductService {
         		.filter(subscription -> subscription.getUser().getUserRole()== UserRole.USER)
         		.map(subscription -> subscription.getUser().getEmail())
         		.collect(Collectors.toList());
+        
+        
         
         snsService.notifyAdminOnUpdateProduct();
         snsService.notifyUserOnUpdateProduct(userEmails);
