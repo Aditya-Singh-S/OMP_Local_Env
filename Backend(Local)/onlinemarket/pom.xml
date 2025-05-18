@@ -42,10 +42,10 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		
-		 <dependency>
+		 <!--<dependency>
         <groupId>org.springframework.boot</groupId>
          <artifactId>spring-boot-starter-security</artifactId>
-         </dependency>
+         </dependency>-->
 		
 		
 		<dependency>
@@ -59,6 +59,10 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+        <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-security</artifactId>
+         </dependency>
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-webmvc</artifactId>
@@ -98,12 +102,6 @@
 		    <scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-core</artifactId>
-		    <scope>test</scope>
-		</dependency>
-		
-		<dependency>
     		<groupId>org.apache.poi</groupId>
     		<artifactId>poi</artifactId>
     		<version>5.2.3</version> <!-- Use the latest version available -->
@@ -132,11 +130,11 @@
 		 <dependency>
 		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi</artifactId>
-		    <version>5.2.5</version> </dependency>
+		    <version>5.2.3</version> </dependency>
 		 <dependency>
 		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi-ooxml</artifactId>
-		    <version>5.2.5</version> 
+		    <version>5.2.3</version> 
 		  </dependency>
 		
          
