@@ -82,13 +82,14 @@ public class SecurityConfig {
                                         		,"/OMP/reviews/getSpecificProductReviews"
                                         		,"/OMP/reviews/highestRatedReview"
                                         		
-                                        		,"OMP/getUserIdByEmail"
+                                        		
+                                        		,"/OMP/myName"
                                         		).permitAll()
                                         
                                         
                    	                     .requestMatchers(
-                   	                    		"OMP/user/image/{userId}",
-                   	                    		"OMP/myDetails/{userId}",
+                   	                    		"OMP/user/image/{userId}"
+                   	                    		,"OMP/myDetails/{userId}",
                    	                    		 "OMP/addSubscription"
                    	                    		 ,"/OMP/removeSubscription"
                    	                    		 ,"OMP/updateUser/{userId}"
@@ -100,6 +101,7 @@ public class SecurityConfig {
                    	                    		,"OMP/getUserEmailById",
                    	                    		"OMP/reviews/all/user/{userId}",
                    	                    		"OMP/product/imageByName/{name}"
+                   	                    		,"OMP/getUserIdByEmail"
                    	                    		).hasAnyAuthority("USER","ADMIN")
                                         
                                         
