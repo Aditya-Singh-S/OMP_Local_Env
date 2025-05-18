@@ -453,23 +453,25 @@ public class ProductServiceImpl implements ProductService {
                 } catch (Exception e) {
                     System.err.println("Error reading data at row " + row.getRowNum() + ": " + e.getMessage());
                     errorOccurred = true;
-                    break; 
+                    break; // **Stop processing immediately**
                 }
 
                 if (pictureIndex >= pictures.size()) {
                     System.err.println("Missing image for product: " + name);
                     missingImage = true;
-                    break; 
+                    break; // **Stop processing immediately**
                 }
 
                 validRows.add(row);
-                pictureIndex++; 
+                pictureIndex++; // Move picture index
             }
 
+            // If any error occurred or image was missing, reject the file
             if (errorOccurred || missingImage) {
                 throw new IllegalArgumentException("Excel rejected: Every product must have an image, name, and description.");
             }
 
+            // Second pass: Process valid rows
             pictureIndex = 0;
             for (Row row : validRows) {
                 String name = row.getCell(0).getStringCellValue();
@@ -502,6 +504,7 @@ public class ProductServiceImpl implements ProductService {
 
         return savedProducts;
     }
+
 
 
 
