@@ -25,7 +25,7 @@ public class ProductViewDTO {
 	private String name;
 	private String description;
 	private String imageUrl;
-	//private boolean isActive;
+	private boolean isactive;
 	private double avg_rating;
 	private int subscription_count;
 
