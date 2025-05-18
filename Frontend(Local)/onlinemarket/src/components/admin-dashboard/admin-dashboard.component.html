@@ -103,12 +103,13 @@
   <div class="popup">
     <h3>Add Multiple Products</h3>
     <form (ngSubmit)="submitBulkProducts()">
-      <input type="file" accept=".xlsx, .xls" (change)="onBulkFileChange($event)" required />
+      <input type="file" accept=".xlsx" (change)="onBulkFileChange($event)" required />
+      <div class="text-danger">* Please add excel of valid format(unique name, description, images)</div>
       <div *ngIf="invalidBulkFileTypeError" class="text-danger">
-        Invalid file type. Only XLS, XLSX files are allowed.
+        * Invalid file type. Only XLSX files are allowed.
       </div>
       <div *ngIf="fileRequiredError" class="text-danger">
-        File is required. Please upload a File.
+        * File is required. Please upload a File.
       </div>  
       <label>
         Active Status:

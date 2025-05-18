@@ -218,7 +218,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   onBulkFileChange(event: any) {
     this.bulkFile = event.target.files[0];
     const allowedTypes = [
-      'application/vnd.ms-excel', // for .xls
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // for .xlsx
     ];
     if(this.bulkFile)
