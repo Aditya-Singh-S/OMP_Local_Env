@@ -93,7 +93,9 @@ public class ReviewAndRatingService {
         }
 
         existingReview.setReviewUpdateOn(Timestamp.from(Instant.now()));
-        snsService.notifyReviewDeleted(existingReview.getUser().getEmail(),existingReview.getProducts().getName(),rating,review);
+        if (reviewActiveStatus != null) { // Only notify on status change?
+            snsService.notifyReviewDeleted(existingReview.getUser().getEmail(), existingReview.getProducts().getName(), existingReview.getRating(), existingReview.getReview());
+        }
         return reviewRepository.save(existingReview);
     }
 
