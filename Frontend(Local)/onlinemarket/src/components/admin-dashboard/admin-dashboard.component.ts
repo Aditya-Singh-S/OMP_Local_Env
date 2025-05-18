@@ -463,7 +463,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   
   addUserForm: any;
  
-  password:string='';
+password:string='Abc@123';
 registrationSuccess = false;
 registrationError = false;
 errorMessage = '';
@@ -487,7 +487,8 @@ submitUser(): void {
   formData.append('email', this.addUser.email);
   formData.append('postalCode', this.addUser.postalCode);
   formData.append('isAdmin', this.addUser.isAdmin ? '1' : '0');
-  this.password=this.addUser.firstName+this.addUser.dob;
+
+  //this.password=this.addUser.firstName+this.addUser.dob;
   console.log(this.password);
   if (this.addUser.imageFile) {
     formData.append('imageFile', this.addUser.imageFile);

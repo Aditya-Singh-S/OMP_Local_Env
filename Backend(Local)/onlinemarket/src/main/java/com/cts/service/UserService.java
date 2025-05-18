@@ -92,7 +92,12 @@ public class UserService {
        return userMapper.toDTO(user);
    }
  
-   
+   public String getUserName(Integer userId) {
+		// TODO Auto-generated method stub
+	   User user = userRepository.findById(userId)
+               .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+	   return user.getFirstName();
+	}
    //Retrieve user ID by email.
    public Integer getUserIdByEmail(String email) {
        User user = userRepository.findByEmail(email);
@@ -317,5 +322,8 @@ public class UserService {
         
         return "http://127.0.0.1:3000/reset-page?email=" + email;
     }
+
+
+	
 }
  
