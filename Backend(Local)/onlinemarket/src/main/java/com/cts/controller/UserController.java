@@ -1,5 +1,5 @@
 package com.cts.controller;
- 
+ import java.util.*;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,17 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
  
+    @GetMapping("/myName")
+    public ResponseEntity<Map<String, String>> getUsername(
+    	@RequestParam(required=false) Integer userId){
+    	if (userId == null) {
+            throw new UserNotFoundException("user not found");
+        }
+    	String userName = userService.getUserName(userId);
+        Map<String, String> response = new HashMap<>();
+        response.put("firstName", userName);
+        return ResponseEntity.ok(response);
+    }
     // Update User API
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<User> updateUserDetails(
