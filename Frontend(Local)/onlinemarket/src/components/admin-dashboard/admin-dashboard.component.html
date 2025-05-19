@@ -31,23 +31,24 @@
     <h3>Add Product</h3>
     <form (ngSubmit)="submitProduct()">
       <input
-  type="text"
-  placeholder="Product Name"
-  [(ngModel)]="productName"
-  name="productName"
-  #name="ngModel"
-  required
-  [pattern]="namePattern"
-  (input)="onProductNameInput($event)" />
-<div *ngIf="name.invalid" class="text-danger">
-  <div *ngIf="name.errors?.['required']">Product name is required.</div>
-  <div *ngIf="name.errors?.['pattern']">
-    Product name must start with a letter, be up to 50 characters long, and can include numbers and spaces.
-  </div>
-</div>
-      <div *ngIf="duplicateProductNameError" class="text-danger">
-        Product name already exists. Please use a different name.
+      type="text"
+      placeholder="Product Name"
+      [(ngModel)]="productName"
+      name="productName"
+      #name="ngModel"
+      required
+      [pattern]="namePattern"
+      (input)="onProductNameInput($event)" />
+    <div *ngIf="name.invalid && name.touched" class="text-danger">
+      <div *ngIf="name.errors?.['required']">Product name is required.</div>
+      <div *ngIf="name.errors?.['pattern']">
+        Product name must start with a letter, be up to 50 characters long, and can include numbers and spaces.
       </div>
+    </div>
+          <div *ngIf="duplicateProductNameError" class="text-danger">
+            Product name already exists. Please use a different name.
+          </div>
+ 
       <input
        type="text"
        placeholder="Description"
@@ -55,16 +56,15 @@
        name="description"
        required
        minlength="100"
-        
+       #desc="ngModel"
       />
  
-      <!-- <div *ngIf="desc.invalid && desc.touched" class="text-danger">
-      <div *ngIf="desc.errors?.['required']">Description is required.</div>-->
-        <!-- <div *ngIf="desc.errors?.['minlength']">  -->
-          <div *ngIf="descriptionError" class="text-danger">
+      <div *ngIf="desc.invalid && desc.touched" class="text-danger">
+      <div *ngIf="desc.errors?.['required']">Description is required.</div>
+        <div *ngIf="desc.errors?.['minlength']">
            Description must be at least 100 characters. ({{ productDescription.length || 0 }}/100)
         </div>
-      <!-- </div> -->
+      </div>
  
  
       <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".jpeg,.jpg,.png" />
@@ -86,15 +86,11 @@
         <input type="checkbox" [(ngModel)]="isActive" name="activeStatus" />
       </label>
       <div class="button-group">
-        <button type="submit" >Submit</button>
-         <button type="button" (click)="closeAddProductPopup()">Cancel</button>
-
-        <!-- [disabled]="duplicateProductNameError || desc.invalid" -->
+        <button type="submit" [disabled]="duplicateProductNameError || desc.invalid">Submit</button> <button type="button" (click)="closeAddProductPopup()">Cancel</button>
       </div>
     </form>
   </div>
 </div>
- 
  
 <div *ngIf="productAdded" class="popupSuccess">
   <div class="popup-contents">
@@ -412,4 +408,16 @@
         </div>
   </div>
   </div>
+
+  <div *ngIf="showAlertPopup" class="alert-popup">
+    <div class="alert-popup-content">
+          <div class="alert-popup-header">
+          <h2>{{ AlertPopupTitle }}</h2>
+          <span class="alert-close-button" (click)="closeAlertPopup()">&times;</span>
+          </div>
+          <div class="alert-popup-body">
+          <p>{{ AlertPopupMessage }}</p>
+          </div>
+    </div>
+    </div>
  

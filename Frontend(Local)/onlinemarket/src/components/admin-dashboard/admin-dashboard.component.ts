@@ -92,6 +92,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // update user popup code
   isUpdateUserPopupVisible: boolean = false;
   
+  showAlertPopup : boolean = false;
+  AlertPopupTitle : string = "";
+  AlertPopupMessage : string = "";
  
   constructor(private productService: ProductService, private userService: UserService, private authService: AuthService, private router: Router) { }
  
@@ -182,6 +185,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
  
   if (!this.productDescription || this.productDescription.length < 100) {
     this.descriptionError = true;
+  }
     if (this.selectedImageFile && !this.duplicateProductNameError) {
       this.productService.addProduct(this.productName, this.productDescription, this.selectedImageFile, this.isActive)
         .subscribe(response => {
@@ -203,7 +207,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         });
       }
     }
-  }
+  
  
   resetAddProductForm() {
     this.productName = '';
@@ -310,17 +314,27 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
               });
             this.productFound = true;
           } else {
-            alert('Product not found!');
+            // alert('Product not found!');
+            this.AlertPopupTitle = "Warning";
+            this.AlertPopupMessage = "Product not found!";
+            this.showAlertPopup = true;
             this.productFound = false;
             this.resetUpdateProductForm();
           }
         }, error => {
-          alert('Error searching for product.');
+          // alert('Error searching for product.');
+          this.AlertPopupTitle = "Warning";
+          this.AlertPopupMessage = "Error searching for product.";
+          this.showAlertPopup = true;
           this.productFound = false;
           this.resetUpdateProductForm(); // Optionally reset the form on error
         });
     } else {
-      alert('Please enter a product name to search.');
+      // alert('Please enter a product name to search.');
+      this.AlertPopupTitle = "Warning";
+      this.AlertPopupMessage = "Please enter a product name to search !";
+      this.showAlertPopup = true;
+      
       this.productFound = false;
       this.resetUpdateProductForm(); // Optionally reset the form if no search term is entered
     }
@@ -615,6 +629,9 @@ resetForm(): void {
  
 }
  
+closeAlertPopup(){
+  this.showAlertPopup = false;
+}
 }
  
  
