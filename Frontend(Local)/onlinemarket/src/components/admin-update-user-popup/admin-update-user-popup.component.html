@@ -108,39 +108,39 @@
                     <!-- <button class="submit-changes-button" (click)="submitSubscriptionChanges()">Submit Changes</button> -->
                 </div>
  
-            <div *ngIf="showReviewsSection" class="reviews-section">
-                <h3>Product Reviews</h3>
- 
-                <div *ngFor="let review of userReviews" class="review-container">
- 
-                    <div class="product-info-header">
-                        <img [src]="'http://localhost:9090/OMP/product/image/'+review.productid" alt="{{ review.productName }}" class="product-image-small">
-                        <div class="product-details-small">
-                            <div class="product-name-small">{{ review.productName }}</div>
+                <div *ngIf="showReviewsSection" class="reviews-section">
+                    <h3>Product Reviews</h3>
+               
+                    <div *ngFor="let review of userReviews | filterActiveReviews" class="review-container">
+               
+                        <div class="product-info-header">
+                            <img [src]="'http://localhost:9090/OMP/product/image/'+review.productid" alt="{{ review.productName }}" class="product-image-small">
+                            <div class="product-details-small">
+                                <div class="product-name-small">{{ review.productName }}</div>
                             </div>
-                    </div>
- 
- 
-                    <div class="user-review-box">
-                        <div class="review-header">
-                            <div class="review-rating">{{ review.rating }} Stars</div>
+                        </div>
+               
+               
+                        <div class="user-review-box">
+                            <div class="review-header">
+                                <div class="review-rating">{{ review.rating }} Stars</div>
                             </div>
-                        <div class="review-text">
-                            {{ review.review }}
-                        </div>
-                        <div class="review-status">
-                            Status: <span [style.color]="review.reviewActiveStatus ? 'green' : 'red'">
-                                {{ review.reviewActiveStatus ? 'Active' : 'Inactive' }}
-                            </span>
-                            <button (click)="toggleReviewStatus(review)" class="status-toggle-button">
-                                {{ review.reviewActiveStatus ? 'Mark Inactive' : 'Mark Active' }}
-                            </button>
+                            <div class="review-text">
+                                {{ review.review }}
+                            </div>
+                            <div class="review-status">
+                                Status: <span [style.color]="review.reviewActiveStatus ? 'green' : 'red'">
+                                    {{ review.reviewActiveStatus ? 'Active' : 'Inactive' }}
+                                </span>
+                                <button (click)="toggleReviewStatus(review)" class="status-toggle-button">
+                                    {{ review.reviewActiveStatus ? 'Mark Inactive' : 'Mark Active' }}
+                                </button>
+                            </div>
                         </div>
                     </div>
+               
+                    <!-- <button class="section-submit-button" (click)="submitReviewChanges()">Save Review Changes</button> -->
                 </div>
- 
-                <button class="section-submit-button" (click)="submitReviewChanges()">Save Review Changes</button>
-            </div>
  
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         </div>
@@ -148,4 +148,16 @@
         <button class="close-button" (click)="closePopup()">&times;</button>
     </div>
 </div>
+
+<div *ngIf="showAlertPopup" class="alert-popup">
+    <div class="alert-popup-content">
+          <div class="alert-popup-header">
+          <h2>{{ popupTitle }}</h2>
+          <span class="alert-close-button" (click)="closeAlertPopup()">&times;</span>
+          </div>
+          <div class="alert-popup-body">
+          <p>{{ popupMessage }}</p>
+          </div>
+    </div>
+    </div>
  
