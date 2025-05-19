@@ -25,14 +25,19 @@
     <div *ngIf="infoMessage" class="info-msg">
       <p>{{infoMessage}}</p>
       <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
-        <input type="email" formControlName="email" [placeholder]="displayEmail" required>
+        <div class="verify">
+        <input id="email" type="email" formControlName="email" [placeholder]="displayEmail" required>
         <div *ngIf="verifyForm.get('email')?.invalid && (verifyForm.get('email')?.dirty || verifyForm.get('email')?.touched)" class="error-msg">
           <p *ngIf="verifyForm.get('email')?.errors?.['required']">Email is required.</p>
           <p *ngIf="verifyForm.get('email')?.errors?.['email']">Please enter a valid email address.</p>
         </div>
         <!-- <p>{{ verifyForm.get('email')?.value }}</p>  -->
+        
+        <div class="buttons">
         <button type="submit" id="submit" [disabled]="verifyForm.invalid">Submit</button>
         <button type="button" id="resend" (click)="resendVerificationEmail()">Resend</button>
+      </div>
+    </div>
       </form>
     </div>
   
@@ -62,8 +67,8 @@
         </div>
 
     <div *ngIf="isVerified" class="success-msg">
-      <p>Verification Successful! You can now sign in.</p>
-      <button id="signin" (click)="goToSignIn()">SignIn</button>
+      <p>Verified! You can sign in now.</p>
+      <button id="signinbtn" (click)="goToSignIn()">SignIn</button>
     </div>
     <div *ngIf="errorMessage" class="error-msg">
       <p>{{errorMessage}}</p>
