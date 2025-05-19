@@ -81,7 +81,7 @@ public class SecurityConfig {
                                         		,"OMP/searchProductByNameAndSubsCount"
                                         		,"/OMP/reviews/getSpecificProductReviews"
                                         		,"/OMP/reviews/highestRatedReview"
-                                        		
+                                        		,"OMP/getUserIdByEmail"
                                         		
                                         		,"/OMP/myName"
                                         		).permitAll()
@@ -101,7 +101,7 @@ public class SecurityConfig {
                    	                    		,"OMP/getUserEmailById",
                    	                    		"OMP/reviews/all/user/{userId}",
                    	                    		"OMP/product/imageByName/{name}"
-                   	                    		,"OMP/getUserIdByEmail"
+                   	                    		
                    	                    		).hasAnyAuthority("USER","ADMIN")
                                         
                                         
