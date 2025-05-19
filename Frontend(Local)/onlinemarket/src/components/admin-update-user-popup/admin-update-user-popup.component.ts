@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, PipeTransform, Pipe } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -44,10 +44,22 @@ interface SubscriptionViewModel extends IProductDTO {
   isSelectedToRemove: boolean;
 }
  
+@Pipe({
+  name: 'filterActiveReviews'
+})
+ 
+export class FilterActiveReviewsPipe implements PipeTransform {
+  transform(reviews: IReview[]): IReview[] {
+    if (!reviews || reviews.length === 0) {
+      return [];
+    }
+    return reviews.filter(review => review.reviewActiveStatus === true);
+  }
+}
 @Component({
   selector: 'app-admin-update-user-popup',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,FilterActiveReviewsPipe],
   templateUrl: './admin-update-user-popup.component.html',
   styleUrls: ['./admin-update-user-popup.component.css']
 })
@@ -77,6 +89,10 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
   showSubscriptionPopup: boolean = false;
   updateSuccessMessage: string | null = null;
  
+  showAlertPopup: boolean = false;
+   popupTitle: string = '';
+   popupMessage: string = '';
+
   constructor(private userService: UserService,
     private productService: ProductService,
     private http: HttpClient,
@@ -161,6 +177,9 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
       this.userService.updateUserActiveStatus(this.currentUserId, this.foundUser.active).subscribe({
         next: (response) => {
           console.log('User active status updated in backend:', response);
+          this.popupTitle = "Success";
+          this.popupMessage = "User Active Status Updated";
+          this.showAlertPopup = true;
           // The local foundUser.isActive is already updated by ngModel
           // Optionally, show a success message
         },
@@ -168,6 +187,9 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
           console.error('Error updating user active status in backend:', error);
           // Optionally, revert the UI change or show an error message
           // If you want to revert the UI on error, you might need to store the previous state
+          this.popupTitle = "Error";
+          this.popupMessage = "Updating User Active Status Failed";
+          this.showAlertPopup = true;
         }
       });
     } else {
@@ -239,16 +261,25 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
         next: (response) => {
           console.log('User updated successfully:', response);
           this.isUpdateUserPopupVisible = false;
-          alert('User updated successfully!');
+          // alert('User updated successfully!');
+          this.popupTitle = "Success";
+          this.popupMessage = "User Updated Successfully";
+          this.showAlertPopup = true;
         },
         error: (error) => {
           console.error('Error updating user:', error);
-          alert('Error updating user.');
+          // alert('Error updating user.');
+          this.popupTitle = "Error";
+          this.popupMessage = "Error Updating User";
+          this.showAlertPopup = true;
         }
       });
     } else {
       console.error('User ID is missing in the user data.');
-      alert('Error: Could not update user (ID missing).');
+      // alert('Error: Could not update user (ID missing).');
+          this.popupTitle = "Error";
+          this.popupMessage = "Could not update user (ID missing)";
+          this.showAlertPopup = true;
     }
   }
  
@@ -283,10 +314,16 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
         tap(response => {
           console.log('Subscriptions updated successfully:', response);
           // Optionally provide feedback to the user
+          this.popupTitle = "Success";
+          this.popupMessage = "Subscriptions updated successfully";
+          this.showAlertPopup = true;
         }),
         catchError(error => {
           console.error('Error updating subscriptions:', error);
           // Optionally display an error message
+          this.popupTitle = "Error";
+          this.popupMessage = "Updating Subscriptions failed";
+          this.showAlertPopup = true;
           return of(null);
         })
       ).subscribe();
@@ -375,10 +412,16 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
           console.log('Review status updated:', response);
           // Update the local array to reflect the change immediately
           review.reviewActiveStatus = newStatus;
+          this.popupTitle = "Success";
+          this.popupMessage = "Review Status Updated Successfully"
+          this.showAlertPopup = true;
         }),
         catchError(error => {
           console.error('Error updating review status:', error);2
           // Optionally show an error message
+          this.popupTitle = "Error";
+          this.popupMessage = "Review Status Updation Failed"
+          this.showAlertPopup = true;
           return of(null);
         })
       )
@@ -414,12 +457,18 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
       this.userService.updateUserActiveStatus(this.currentUserId, active).subscribe({
         next: (response) => {
           console.log('User active status updated in backend:', response);
+          // this.popupTitle = "Success";
+          // this.popupMessage = "User Active Status Updated";
+          // this.showAlertPopup = true;
           this.foundUser!.active = active; // Update the local foundUser object
           // Optionally, show a success message
         },
         error: (error) => {
           console.error('Error updating user active status in backend:', error);
           // Optionally, revert the UI change or show an error message
+          // this.popupTitle = "Error";
+          // this.popupMessage = "Updating User Active Status Failed";
+          // this.showAlertPopup = true;
         }
       });
     } else {
@@ -437,6 +486,9 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
         next: (response) => {
           console.log('Subscription removed successfully:', response);
           this.userSubscriptions.splice(index, 1);
+          this.popupTitle = "Success";
+          this.popupMessage = "Subscription Updated Successfully";
+          this.showAlertPopup = true;
           // Optionally update UI or show success message
         },
         error: (error) => {
@@ -541,6 +593,9 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
           this.userService.removeSubscription(this.currentUserId!, productId).subscribe({
             next: (response) => {
               console.log(`Subscription for product ${productId} removed successfully for user ${this.currentUserId}:`, response);
+              this.popupTitle = "Success";
+              this.popupMessage = "Product Subscriptions Updated Successfully";
+              this.showAlertPopup = true;
               removalCount++;
               if (removalCount === productsToRemove.length) {
                 this.loadUserSubscriptions(this.currentUserId!); // Reload the list after all removals, pass userId
@@ -597,6 +652,10 @@ export class AdminUpdateUserPopupComponent implements OnInit, OnDestroy {
 closeSubscriptionPopup(): void {
     this.showSubscriptionPopup = false;
     this.updateSuccessMessage = null; // Clear success message when closing
+}
+
+closeAlertPopup(){
+  this.showAlertPopup = false;
 }
 }
  
