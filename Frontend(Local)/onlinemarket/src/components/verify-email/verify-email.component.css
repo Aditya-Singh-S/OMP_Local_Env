@@ -34,15 +34,49 @@ input {
     text-align: center;
     min-height: 78px;
 }
+
+.buttons{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+
  
 #submit {
     background-color: purple;
     color: white;
     padding: 10px;
     border: none;
-    width: 50%;
+    width: 40%;
     font-size: 16px;
 }
+
+#resend{
+    background-color: purple;
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 40%;
+    font-size: 16px;
+}
+
+#signinbtn{
+    background-color: purple;
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 70%;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+#email{
+  display: flex;
+  align-items: center;
+}
+
  
 .forgot-password {
     display: block;
