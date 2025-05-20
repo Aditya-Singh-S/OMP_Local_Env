@@ -245,6 +245,11 @@ public class UserAdminService {
 		return userRepository.findByIsActive(isActive);
 	}
 	
+	public List<User> getUsersByIsActivebyemail(boolean emailVerification) {
+		return userRepository.findByEmailVerification(emailVerification);
+	}
+	
+	
 	// Added by Loga on May 15
 	   public List<User> getUsersByFilter(Boolean isActive, Boolean isEmailVerified) {
 	       Specification<User> spec = Specification.where(null);

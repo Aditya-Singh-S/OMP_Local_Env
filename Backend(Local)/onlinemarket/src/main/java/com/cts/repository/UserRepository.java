@@ -29,6 +29,8 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
     List<String> getAdminList();
     
     List<User> findByIsActive(boolean isActive);
+    
+    List<User> findByEmailVerification(boolean emailVerification);  
 
 	
 }

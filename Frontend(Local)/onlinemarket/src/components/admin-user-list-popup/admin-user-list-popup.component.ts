@@ -99,19 +99,19 @@ export class AdminUserListPopupComponent implements OnInit {
 
 getUsersByActiveStatus(isActive: boolean): Observable<UserDetail[]> {
     const params = new HttpParams().set('isActive', isActive.toString());
-    return this.http.get<UserDetail[]>(`${this.baseUrl}/admin/users/filter`, { params });
+    return this.http.get<UserDetail[]>(`${this.baseUrl}/admin/users/active`, { headers : this.userService.authHeaders,params });
 }
 
 getVerifiedUsers(): Observable<UserDetail[]> {
     const params = new HttpParams().set('emailVerification', 'true');
-    return this.http.get<UserDetail[]>(`${this.baseUrl}/admin/users/filter`, { params }).pipe(
+    return this.http.get<UserDetail[]>(`${this.baseUrl}/admin/users/verified`, {headers : this.userService.authHeaders,params }).pipe(
       tap(data => console.log('Verified users data:', data)) 
     );
 }
 
 getNotVerifiedUsers(): Observable<UserDetail[]> {
     const params = new HttpParams().set('emailVerification', 'false');
-    return this.http.get<UserDetail[]>(`${this.baseUrl}/admin/users/filter`, { params }).pipe(
+    return this.http.get<UserDetail[]>(`${this.baseUrl}/admin/users/verified`, {headers : this.userService.authHeaders,params }).pipe(
       tap(data => console.log('Not verified users data:', data)) 
     );
 }
@@ -133,6 +133,7 @@ getNotVerifiedUsers(): Observable<UserDetail[]> {
         'Active': user.active ? 'Yes' : 'No',
         'Email Verified': user.emailVerification ? 'Yes' : 'No',
         'Role': user.userRole 
+
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(formattedUsers);
